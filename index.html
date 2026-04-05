@@ -71,7 +71,6 @@ body {
   top: 5px;
   right: 8px;
   font-size: 18px;
-  cursor: pointer;
 }
 
 /* PLAYER */
@@ -111,7 +110,7 @@ body {
   <img src="logo.png">
 </div>
 
-<input class="search" id="buscador" placeholder="Buscar...">
+<input class="search" id="buscador" placeholder="Buscar radio...">
 
 <div class="grid" id="grid"></div>
 
@@ -125,20 +124,28 @@ body {
   <audio id="audio"></audio>
 </div>
 
-<!-- HLS -->
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
 <script>
 let radios = [
 
-/* 🔥 TUS RADIOS BUENAS */
+/* 🌍 INTERNACIONALES */
 {nombre:"Urban Radio", url:"https://stream.0nlineradio.com/urban"},
 {nombre:"Dance Wave", url:"https://dancewave.online/dance.mp3"},
-{nombre:"Radio Internacional", url:"https://streams.ilovemusic.de/iloveradio1.mp3"},
+{nombre:"I Love Radio", url:"https://streams.ilovemusic.de/iloveradio1.mp3"},
 {nombre:"Romantic Hits EU", url:"https://stream.zeno.fm/0r0xa792kwzuv"},
 
-/* ⚠️ RADIO EXTRA (PUEDE FALLAR) */
-{nombre:"Radio HLS (Test)", url:"https://pe-p2-p-e-ep1-audio.cdn.mdstrm.com/live-audio-aw/6839e2376607bdf6b2fcde27/playlist.m3u8"}
+/* 🇵🇪 PERÚ (FUNCIONALES) */
+{nombre:"Ritmo Romántica", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/CRP_RIT_SC.mp3"},
+{nombre:"Radio Moda", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/CRP_MOD_SC.mp3"},
+{nombre:"Radiomar", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/CRP_MAR_SC.mp3"},
+{nombre:"La Karibeña", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/CRP_KAR_SC.mp3"},
+{nombre:"Oasis", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/CRP_OAS_SC.mp3"},
+{nombre:"RPP Noticias", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/RPP_SC.mp3"},
+
+/* 📡 EXTRA */
+{nombre:"Exitosa", url:"https://cu.onliv3.com/live/exitosa.m3u8"},
+{nombre:"Radio Nacional", url:"https://stream.radionacional.gob.pe/nacional.mp3"}
 
 ];
 
@@ -151,6 +158,8 @@ const cover = document.getElementById("cover");
 const playBtn = document.getElementById("playBtn");
 const vol = document.getElementById("vol");
 
+audio.setAttribute("playsinline", true);
+
 let hls;
 
 /* LOGO */
@@ -158,7 +167,7 @@ function logo(nombre){
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(nombre)}&background=ff0000&color=fff`;
 }
 
-/* PLAYER INTELIGENTE */
+/* PLAYER */
 function playRadio(url){
 
   if(hls){
@@ -221,13 +230,13 @@ function render(lista){
   });
 }
 
-/* BUSCAR */
+/* BUSCADOR */
 document.getElementById("buscador").addEventListener("input", e => {
   const t = e.target.value.toLowerCase();
   render(radios.filter(r => r.nombre.toLowerCase().includes(t)));
 });
 
-/* PLAY */
+/* PLAY / PAUSE */
 playBtn.onclick = () => {
   if(audio.paused){
     audio.play();
@@ -241,6 +250,14 @@ audio.onpause = () => playBtn.textContent = "▶";
 
 /* VOLUMEN */
 vol.oninput = () => audio.volume = vol.value;
+
+/* AUTO RECONNECT (IMPORTANTE) */
+audio.onerror = () => {
+  setTimeout(() => {
+    audio.load();
+    audio.play();
+  }, 3000);
+};
 
 /* INIT */
 render(radios);
