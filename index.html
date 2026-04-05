@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TENAZ F.M.</title>
 
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
 <style>
 body {
   margin:0;
@@ -83,7 +85,6 @@ button {
   color:white;
   cursor:pointer;
 }
-
 </style>
 </head>
 
@@ -91,7 +92,7 @@ button {
 
 <header>
   <img src="https://cdn-icons-png.flaticon.com/512/727/727245.png">
-  <h2>🎧 TENAZ F.M.</h2>
+  <h2>TENAZ F.M.</h2>
 </header>
 
 <div class="search">
@@ -108,17 +109,13 @@ button {
   </div>
 </div>
 
-<audio id="player"></audio>
+<audio id="player" controls></audio>
 
 <script>
 
 const radios = [
-{nombre:"La Mega", img:"https://via.placeholder.com/150?text=La+Mega", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/MEGA_SC"},
-{nombre:"Oasis FM", img:"https://via.placeholder.com/150?text=Oasis", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/OASIS_SC"},
-{nombre:"RPP Noticias", img:"https://via.placeholder.com/150?text=RPP", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/RPP_SC"},
-{nombre:"Moda FM", img:"https://via.placeholder.com/150?text=Moda", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/MODA_SC"},
-{nombre:"Studio 92", img:"https://via.placeholder.com/150?text=Studio92", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/STUDIO92_SC"},
-{nombre:"Planeta", img:"https://via.placeholder.com/150?text=Planeta", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/PLANETA_SC"}
+{nombre:"Radio Test 1", img:"https://via.placeholder.com/150?text=Radio+1", url:"https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"},
+{nombre:"Radio Test 2", img:"https://via.placeholder.com/150?text=Radio+2", url:"https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8"}
 ];
 
 const lista = document.getElementById("lista");
@@ -126,17 +123,7 @@ const player = document.getElementById("player");
 const actual = document.getElementById("actual");
 
 let actualUrl = "";
-let favoritos = JSON.parse(localStorage.getItem("fav")) || [];
-
-function toggleFav(nombre){
-  if(favoritos.includes(nombre)){
-    favoritos = favoritos.filter(f=>f!==nombre);
-  } else {
-    favoritos.push(nombre);
-  }
-  localStorage.setItem("fav", JSON.stringify(favoritos));
-  cargar();
-}
+let hls;
 
 function cargar(filtro=""){
   lista.innerHTML="";
@@ -147,20 +134,30 @@ function cargar(filtro=""){
     let div=document.createElement("div");
     div.className="card";
 
-    let esFav = favoritos.includes(r.nombre);
-
     div.innerHTML=`
-      <div class="fav" onclick="event.stopPropagation(); toggleFav('${r.nombre}')">
-        ${esFav ? "❤️" : "🤍"}
-      </div>
-      <img src="${r.img}" onerror="this.src='https://via.placeholder.com/150'">
+      <img src="${r.img}">
       <p>${r.nombre}</p>
     `;
 
     div.onclick=()=>{
       actualUrl = r.url;
-      player.src = r.url;
-      player.play();
+
+      if(hls){
+        hls.destroy();
+      }
+
+      if(Hls.isSupported()){
+        hls = new Hls();
+        hls.loadSource(r.url);
+        hls.attachMedia(player);
+        hls.on(Hls.Events.MANIFEST_PARSED,function(){
+          player.play();
+        });
+      } else {
+        player.src = r.url;
+        player.play();
+      }
+
       actual.innerText = "🎵 " + r.nombre;
     };
 
@@ -169,7 +166,7 @@ function cargar(filtro=""){
 }
 
 function play(){
-  if(actualUrl) player.play();
+  player.play();
 }
 
 function stop(){
