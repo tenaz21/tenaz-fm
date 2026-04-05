@@ -13,22 +13,21 @@ body {
   color: white;
 }
 
-/* HEADER */
-.header {
+/* LOGO */
+.logo {
   text-align: center;
-  font-size: 36px;
-  font-weight: 900;
-  margin: 20px;
-  letter-spacing: 2px;
-  background: linear-gradient(90deg,#ff0000,#ffffff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  margin-top: 10px;
+}
+
+.logo img {
+  width: 90%;
+  max-width: 350px;
 }
 
 /* BUSCADOR */
 .search {
   width: 85%;
-  margin: auto;
+  margin: 10px auto;
   display: block;
   padding: 12px;
   border-radius: 25px;
@@ -40,7 +39,7 @@ body {
   display: flex;
   overflow-x: auto;
   gap: 10px;
-  padding: 15px;
+  padding: 10px;
 }
 
 .cat {
@@ -58,7 +57,7 @@ body {
   grid-template-columns: repeat(2,1fr);
   gap: 12px;
   padding: 15px;
-  padding-bottom: 90px; /* 🔥 espacio para el player */
+  padding-bottom: 90px;
 }
 
 .radio {
@@ -74,13 +73,6 @@ body {
   width: 100%;
   height: 90px;
   border-radius: 10px;
-}
-
-/* TEXTO COMPLETO */
-.radio p {
-  font-size: 14px;
-  margin-top: 5px;
-  word-wrap: break-word;
 }
 
 /* PLAYER */
@@ -117,7 +109,10 @@ body {
 
 <body>
 
-<div class="header">🇵🇪 URBAN FLOW RADIO 🇵🇪</div>
+<!-- 🔥 LOGO -->
+<div class="logo">
+  <img src="logo.png">
+</div>
 
 <input class="search" id="buscador" placeholder="Buscar radio...">
 
@@ -144,21 +139,19 @@ body {
 <script>
 const radios = [
 
-/* 🔥 TUS RADIOS */
+/* URBAN */
 {nombre:"Urban Radio", tipo:"urban", url:"https://stream.0nlineradio.com/urban"},
 {nombre:"Dance Wave", tipo:"urban", url:"https://dancewave.online/dance.mp3"},
 {nombre:"Radio Internacional", tipo:"urban", url:"https://streams.ilovemusic.de/iloveradio1.mp3"},
+
+/* BALADAS */
 {nombre:"Romantic Hits EU", tipo:"baladas", url:"https://stream.zeno.fm/0r0xa792kwzuv"},
-
-/* 💖 BALADAS */
 {nombre:"Love Songs FM", tipo:"baladas", url:"https://stream.zeno.fm/9s7z1k5f8wzuv"},
-{nombre:"Soft Rock Ballads", tipo:"baladas", url:"https://stream.zeno.fm/7g1p9h8tkwzuv"},
-{nombre:"Romantic Radio", tipo:"baladas", url:"https://stream.zeno.fm/f3y6q8zq5wzuv"},
 
-/* 🌴 REGGAE */
-{nombre:"Reggae141", tipo:"reggae", url:"https://stream.zeno.fm/1g8z9qk2kwzuv"},
-{nombre:"BigUp Radio Reggae", tipo:"reggae", url:"https://bigupradio1.cdnstream.com/5187_128"},
-{nombre:"Reggae Nation", tipo:"reggae", url:"https://stream.zeno.fm/d3y6f9r6kwzuv"}
+/* REGGAE (FUNCIONALES) */
+{nombre:"BigUp Reggae", tipo:"reggae", url:"https://bigupradio1.cdnstream.com/5187_128"},
+{nombre:"Rasta Music", tipo:"reggae", url:"https://stream.zeno.fm/4y4v1k9kwzuv"},
+{nombre:"Reggae Vibes", tipo:"reggae", url:"https://stream.zeno.fm/1g8z9qk2kwzuv"}
 
 ];
 
@@ -171,7 +164,7 @@ const vol = document.getElementById("vol");
 
 let listaActual = radios;
 
-/* LOGO */
+/* LOGO RADIO */
 function logo(nombre){
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(nombre)}&background=ff0000&color=fff`;
 }
