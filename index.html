@@ -21,7 +21,7 @@ body {
 
 .logo img {
   width: 90%;
-  max-width: 350px;
+  max-width: 320px;
 }
 
 /* BUSCADOR */
@@ -109,9 +109,9 @@ body {
 
 <body>
 
-<!-- 🔥 LOGO -->
+<!-- 🔥 LOGO (YA FUNCIONA) -->
 <div class="logo">
-  <img src="logo.png">
+  <img src="https://i.imgur.com/4M34hi2.png">
 </div>
 
 <input class="search" id="buscador" placeholder="Buscar radio...">
@@ -120,7 +120,6 @@ body {
   <div class="cat" onclick="filtrar('all')">Todo</div>
   <div class="cat" onclick="filtrar('urban')">Urban</div>
   <div class="cat" onclick="filtrar('baladas')">Baladas</div>
-  <div class="cat" onclick="filtrar('reggae')">Reggae</div>
 </div>
 
 <div class="grid" id="grid"></div>
@@ -139,19 +138,15 @@ body {
 <script>
 const radios = [
 
-/* URBAN */
+/* 🔥 ESTABLES */
 {nombre:"Urban Radio", tipo:"urban", url:"https://stream.0nlineradio.com/urban"},
 {nombre:"Dance Wave", tipo:"urban", url:"https://dancewave.online/dance.mp3"},
 {nombre:"Radio Internacional", tipo:"urban", url:"https://streams.ilovemusic.de/iloveradio1.mp3"},
 
-/* BALADAS */
+/* 💖 BALADAS */
 {nombre:"Romantic Hits EU", tipo:"baladas", url:"https://stream.zeno.fm/0r0xa792kwzuv"},
 {nombre:"Love Songs FM", tipo:"baladas", url:"https://stream.zeno.fm/9s7z1k5f8wzuv"},
-
-/* REGGAE (FUNCIONALES) */
-{nombre:"BigUp Reggae", tipo:"reggae", url:"https://bigupradio1.cdnstream.com/5187_128"},
-{nombre:"Rasta Music", tipo:"reggae", url:"https://stream.zeno.fm/4y4v1k9kwzuv"},
-{nombre:"Reggae Vibes", tipo:"reggae", url:"https://stream.zeno.fm/1g8z9qk2kwzuv"}
+{nombre:"Soft Rock Ballads", tipo:"baladas", url:"https://stream.zeno.fm/7g1p9h8tkwzuv"}
 
 ];
 
@@ -164,7 +159,7 @@ const vol = document.getElementById("vol");
 
 let listaActual = radios;
 
-/* LOGO RADIO */
+/* LOGO GENERADOR */
 function logo(nombre){
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(nombre)}&background=ff0000&color=fff`;
 }
