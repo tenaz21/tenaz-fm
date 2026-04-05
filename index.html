@@ -13,54 +13,31 @@ body {
   color: white;
 }
 
-/* 🔥 LOGO NIVEL DIOS */
+/* LOGO */
 .logo {
   display: flex;
   justify-content: center;
-  align-items: center;
-  padding: 15px 10px;
+  padding: 15px;
 }
-
 .logo img {
   width: 100%;
   max-width: 420px;
-  height: auto;
-  object-fit: contain;
   border-radius: 15px;
   animation: glow 2s infinite alternate;
 }
-
-/* ANIMACIÓN */
 @keyframes glow {
   from { box-shadow: 0 0 10px red; }
-  to { box-shadow: 0 0 35px orange; }
+  to { box-shadow: 0 0 30px orange; }
 }
 
 /* BUSCADOR */
 .search {
   width: 85%;
   margin: auto;
-  display: block;
   padding: 12px;
   border-radius: 25px;
   border: none;
-  margin-bottom: 10px;
-}
-
-/* BOTONES */
-.botones {
-  text-align: center;
-}
-
-.botones button {
-  padding: 8px 12px;
-  margin: 5px;
-  border: none;
-  border-radius: 20px;
-  background: white;
-  color: red;
-  font-weight: bold;
-  cursor: pointer;
+  display: block;
 }
 
 /* GRID */
@@ -79,11 +56,7 @@ body {
   padding: 10px;
   text-align: center;
   cursor: pointer;
-  transition: 0.2s;
-}
-
-.radio:hover {
-  transform: scale(1.05);
+  position: relative;
 }
 
 .radio img {
@@ -92,12 +65,21 @@ body {
   border-radius: 10px;
 }
 
-/* PLAYER PRO */
+/* FAVORITO */
+.fav {
+  position: absolute;
+  top: 5px;
+  right: 8px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+/* PLAYER */
 .player {
   position: fixed;
   bottom: 0;
   width: 100%;
-  background: linear-gradient(90deg,#000,#111);
+  background: #111;
   padding: 10px;
   display: flex;
   align-items: center;
@@ -114,65 +96,30 @@ body {
   border: none;
   border-radius: 50%;
   padding: 10px;
-  font-size: 18px;
   color: white;
-  box-shadow: 0 0 10px red;
 }
 
-/* VOLUMEN */
 .vol {
   width: 80px;
-}
-
-/* BARRA ANIMADA */
-.equalizer {
-  display: flex;
-  gap: 3px;
-}
-
-.bar {
-  width: 3px;
-  height: 10px;
-  background: lime;
-  animation: bounce 1s infinite;
-}
-
-@keyframes bounce {
-  0%,100% {height:5px;}
-  50% {height:15px;}
 }
 </style>
 </head>
 
 <body>
 
-<!-- 🔥 LOGO -->
+<!-- LOGO -->
 <div class="logo">
   <img src="logo.png">
 </div>
 
 <input class="search" id="buscador" placeholder="Buscar...">
 
-<div class="botones">
-  <button onclick="modoRadios()">Radios</button>
-  <button onclick="subirMusica()">Tu Música</button>
-  <button onclick="cargarM3U()">Lista M3U</button>
-</div>
-
-<input type="file" id="fileMusica" accept="audio/*" multiple hidden>
-<input type="file" id="fileM3U" accept=".m3u" hidden>
-
 <div class="grid" id="grid"></div>
 
 <!-- PLAYER -->
 <div class="player">
   <img id="cover" src="https://via.placeholder.com/50">
-  <div>
-    <div id="titulo">Nada sonando</div>
-    <div class="equalizer">
-      <div class="bar"></div><div class="bar"></div><div class="bar"></div>
-    </div>
-  </div>
+  <div id="titulo">Nada sonando</div>
 
   <button class="btn" id="playBtn">▶</button>
   <input type="range" id="vol" class="vol" min="0" max="1" step="0.01" value="1">
@@ -182,14 +129,16 @@ body {
 
 <script>
 let radios = [
-{nombre:"Ritmo romantica", url:"https://pe-p3-p-e-fz2-audio.cdn.mdstrm.com/live-audio-aw/6839e2376607bdf6b2fcde27/dH79Tnk8vQw-355082578-4992.aac"},
+
+/* 🔥 RADIOS QUE FUNCIONAN */
 {nombre:"Urban Radio", url:"https://stream.0nlineradio.com/urban"},
 {nombre:"Dance Wave", url:"https://dancewave.online/dance.mp3"},
 {nombre:"Radio Internacional", url:"https://streams.ilovemusic.de/iloveradio1.mp3"},
 {nombre:"Romantic Hits EU", url:"https://stream.zeno.fm/0r0xa792kwzuv"}
+
 ];
 
-let listaActual = radios;
+let favoritos = JSON.parse(localStorage.getItem("fav")) || [];
 
 const grid = document.getElementById("grid");
 const audio = document.getElementById("audio");
@@ -198,22 +147,29 @@ const cover = document.getElementById("cover");
 const playBtn = document.getElementById("playBtn");
 const vol = document.getElementById("vol");
 
+/* LOGO RADIO */
 function logo(nombre){
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(nombre)}&background=ff0000&color=fff`;
 }
 
+/* RENDER */
 function render(lista){
   grid.innerHTML = "";
 
   lista.forEach(r => {
+
+    const esFav = favoritos.includes(r.nombre);
+
     const div = document.createElement("div");
     div.className = "radio";
 
     div.innerHTML = `
+      <span class="fav">${esFav ? "❤️" : "🤍"}</span>
       <img src="${logo(r.nombre)}">
       <p>${r.nombre}</p>
     `;
 
+    /* PLAY */
     div.onclick = () => {
       audio.src = r.url;
       audio.play();
@@ -221,15 +177,31 @@ function render(lista){
       cover.src = logo(r.nombre);
     };
 
+    /* FAVORITO */
+    div.querySelector(".fav").onclick = (e) => {
+      e.stopPropagation();
+
+      if(esFav){
+        favoritos = favoritos.filter(f => f !== r.nombre);
+      } else {
+        favoritos.push(r.nombre);
+      }
+
+      localStorage.setItem("fav", JSON.stringify(favoritos));
+      render(radios);
+    };
+
     grid.appendChild(div);
   });
 }
 
+/* BUSCAR */
 document.getElementById("buscador").addEventListener("input", e => {
   const t = e.target.value.toLowerCase();
-  render(listaActual.filter(r => r.nombre.toLowerCase().includes(t)));
+  render(radios.filter(r => r.nombre.toLowerCase().includes(t)));
 });
 
+/* PLAY */
 playBtn.onclick = () => {
   if(audio.paused){
     audio.play();
@@ -241,58 +213,11 @@ playBtn.onclick = () => {
 audio.onplay = () => playBtn.textContent = "⏸";
 audio.onpause = () => playBtn.textContent = "▶";
 
+/* VOLUMEN */
 vol.oninput = () => audio.volume = vol.value;
 
-/* MÚSICA */
-function subirMusica(){
-  fileMusica.click();
-}
-
-fileMusica.onchange = e => {
-  const files = [...e.target.files];
-  listaActual = files.map(f => ({
-    nombre:f.name,
-    url:URL.createObjectURL(f)
-  }));
-  render(listaActual);
-};
-
-/* M3U */
-function cargarM3U(){
-  fileM3U.click();
-}
-
-fileM3U.onchange = e => {
-  const reader = new FileReader();
-  reader.onload = event => {
-    const lines = event.target.result.split("\n");
-    listaActual = [];
-
-    for(let i=0;i<lines.length;i++){
-      if(lines[i].includes("#EXTINF")){
-        listaActual.push({
-          nombre: lines[i].split(",")[1],
-          url: lines[i+1]
-        });
-      }
-    }
-
-    render(listaActual);
-  };
-  reader.readAsText(e.target.files[0]);
-};
-
-function modoRadios(){
-  listaActual = radios;
-  render(listaActual);
-}
-
+/* INICIO */
 render(radios);
-</script>
-
-</body>
-</html>
-
 </script>
 
 </body>
