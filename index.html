@@ -15,8 +15,8 @@ body {
 
 /* HEADER */
 .header {
-  padding: 20px;
   text-align: center;
+  padding: 20px;
   font-size: 28px;
   font-weight: bold;
 }
@@ -29,22 +29,6 @@ body {
   padding: 12px;
   border-radius: 25px;
   border: none;
-}
-
-/* CATEGORIAS */
-.categorias {
-  display: flex;
-  gap: 10px;
-  overflow-x: auto;
-  padding: 15px;
-}
-
-.cat {
-  background: #ff9800;
-  padding: 8px 15px;
-  border-radius: 20px;
-  cursor: pointer;
-  white-space: nowrap;
 }
 
 /* GRID */
@@ -67,6 +51,8 @@ body {
 
 .radio img {
   width: 100%;
+  height: 80px;
+  object-fit: cover;
   border-radius: 10px;
 }
 
@@ -78,7 +64,7 @@ body {
   font-size: 18px;
 }
 
-/* MINI PLAYER */
+/* PLAYER */
 .player {
   position: fixed;
   bottom: 0;
@@ -95,7 +81,8 @@ body {
   border-radius: 10px;
 }
 
-.controls button {
+/* BOTON */
+.btn {
   background: orange;
   border: none;
   border-radius: 50%;
@@ -104,7 +91,7 @@ body {
 }
 
 /* VOLUMEN */
-.volumen {
+.vol {
   width: 80px;
 }
 </style>
@@ -112,28 +99,19 @@ body {
 
 <body>
 
-<div class="header">🇵🇪 TENAZ FM</div>
+<div class="header">🔥 TENAZ FM</div>
 
 <input class="search" id="buscador" placeholder="Buscar radio...">
 
-<div class="categorias">
-  <div class="cat" onclick="filtrar('all')">Todas</div>
-  <div class="cat" onclick="filtrar('hiphop')">Hip Hop</div>
-  <div class="cat" onclick="filtrar('music')">Música</div>
-</div>
-
 <div class="grid" id="grid"></div>
 
-<!-- PLAYER -->
 <div class="player">
   <img id="cover" src="https://via.placeholder.com/50">
   <div id="titulo">Nada sonando</div>
 
-  <div class="controls">
-    <button onclick="playPause()">▶</button>
-  </div>
+  <button class="btn" id="playBtn">▶</button>
 
-  <input type="range" id="vol" class="volumen" min="0" max="1" step="0.01" value="1">
+  <input type="range" id="vol" class="vol" min="0" max="1" step="0.01" value="1">
 
   <audio id="audio"></audio>
 </div>
@@ -141,13 +119,15 @@ body {
 <script>
 const radios = [
 
-{nombre:"Dance Wave", tipo:"music", url:"https://dancewave.online/dance.mp3"},
-{nombre:"Radio Internacional", tipo:"music", url:"https://streams.ilovemusic.de/iloveradio1.mp3"},
+/* FUNCIONAN */
+{nombre:"Dance Wave", url:"https://dancewave.online/dance.mp3"},
+{nombre:"Radio Internacional", url:"https://streams.ilovemusic.de/iloveradio1.mp3"},
 
-/* HIP HOP */
-{nombre:"Hip Hop Hits", tipo:"hiphop", url:"https://stream.zeno.fm/4wqre23fytzuv"},
-{nombre:"Urban Beats", tipo:"hiphop", url:"https://stream.zeno.fm/f8xw4k6x5wzuv"},
-{nombre:"Rap FM", tipo:"hiphop", url:"https://stream.zeno.fm/7x8f7v6r8wzuv"}
+/* HIP HOP 🔥 */
+{nombre:"Hot 108 Jamz", url:"https://icecast.powerhitz.com/icecast.php?i=1&file=hot108jamz"},
+{nombre:"2000 FM Hip Hop", url:"https://2000fm.stream.laut.fm/2000fm"},
+{nombre:"Urban Radio", url:"https://stream.0nlineradio.com/urban"},
+{nombre:"Streetz Radio", url:"https://stream.zeno.fm/9s7z1k5f8wzuv"}
 
 ];
 
@@ -157,12 +137,17 @@ const grid = document.getElementById("grid");
 const audio = document.getElementById("audio");
 const titulo = document.getElementById("titulo");
 const cover = document.getElementById("cover");
+const playBtn = document.getElementById("playBtn");
 const vol = document.getElementById("vol");
 
-let listaActual = radios;
-let playing = false;
+let current = null;
 
-/* MOSTRAR */
+/* LOGO AUTOMATICO */
+function getLogo(nombre){
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(nombre)}&background=ff9800&color=fff`;
+}
+
+/* RENDER */
 function render(lista){
   grid.innerHTML = "";
 
@@ -175,16 +160,16 @@ function render(lista){
 
     div.innerHTML = `
       <span class="fav">${fav ? "❤️" : "🤍"}</span>
-      <img src="https://via.placeholder.com/100">
+      <img src="${getLogo(r.nombre)}">
       <p>${r.nombre}</p>
     `;
 
-    /* PLAY */
     div.onclick = () => {
       audio.src = r.url;
       audio.play();
       titulo.textContent = r.nombre;
-      playing = true;
+      cover.src = getLogo(r.nombre);
+      current = r;
     };
 
     /* FAVORITO */
@@ -198,46 +183,38 @@ function render(lista){
       }
 
       localStorage.setItem("fav", JSON.stringify(favoritos));
-      render(listaActual);
+      render(lista);
     };
 
     grid.appendChild(div);
   });
 }
 
-/* FILTRO */
-function filtrar(tipo){
-  if(tipo === "all"){
-    listaActual = radios;
-  } else {
-    listaActual = radios.filter(r => r.tipo === tipo);
-  }
-  render(listaActual);
-}
-
-/* BUSCADOR */
-document.getElementById("buscador").addEventListener("input", e => {
-  const t = e.target.value.toLowerCase();
-  render(listaActual.filter(r => r.nombre.toLowerCase().includes(t)));
-});
-
-/* PLAY */
-function playPause(){
+/* PLAY REAL */
+playBtn.onclick = () => {
   if(!audio.src) return;
 
-  if(playing){
-    audio.pause();
-  } else {
+  if(audio.paused){
     audio.play();
+    playBtn.textContent = "⏸";
+  } else {
+    audio.pause();
+    playBtn.textContent = "▶";
   }
+};
 
-  playing = !playing;
-}
+/* SINCRONIZAR BOTON */
+audio.onplay = () => playBtn.textContent = "⏸";
+audio.onpause = () => playBtn.textContent = "▶";
 
 /* VOLUMEN */
-vol.oninput = () => {
-  audio.volume = vol.value;
-};
+vol.oninput = () => audio.volume = vol.value;
+
+/* BUSCAR */
+document.getElementById("buscador").addEventListener("input", e => {
+  const t = e.target.value.toLowerCase();
+  render(radios.filter(r => r.nombre.toLowerCase().includes(t)));
+});
 
 /* INIT */
 render(radios);
