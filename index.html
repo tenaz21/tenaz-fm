@@ -9,21 +9,20 @@
 body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(180deg,#000000,#1a1a1a);
+  background: linear-gradient(180deg,#b30000,#1a0000);
   color: white;
 }
 
-/* 🔥 TITULO URBANO */
+/* HEADER */
 .header {
   text-align: center;
-  font-size: 38px;
+  font-size: 36px;
   font-weight: 900;
   margin: 20px;
-  letter-spacing: 3px;
-  background: linear-gradient(90deg,#ff0000,#ff9900,#00ffcc);
+  letter-spacing: 2px;
+  background: linear-gradient(90deg,#ff0000,#ffffff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-shadow: 0 0 20px rgba(255,0,0,0.6);
 }
 
 /* BUSCADOR */
@@ -45,18 +44,21 @@ body {
 }
 
 .cat {
-  background: #ff9900;
+  background: white;
+  color: red;
   padding: 8px 15px;
   border-radius: 20px;
   cursor: pointer;
+  font-weight: bold;
 }
 
 /* GRID */
 .grid {
   display: grid;
-  grid-template-columns: repeat(3,1fr);
+  grid-template-columns: repeat(2,1fr);
   gap: 12px;
   padding: 15px;
+  padding-bottom: 90px; /* 🔥 espacio para el player */
 }
 
 .radio {
@@ -70,8 +72,15 @@ body {
 
 .radio img {
   width: 100%;
-  height: 80px;
+  height: 90px;
   border-radius: 10px;
+}
+
+/* TEXTO COMPLETO */
+.radio p {
+  font-size: 14px;
+  margin-top: 5px;
+  word-wrap: break-word;
 }
 
 /* PLAYER */
@@ -92,7 +101,8 @@ body {
 }
 
 .btn {
-  background: #ff9900;
+  background: red;
+  color: white;
   border: none;
   border-radius: 50%;
   padding: 10px;
@@ -107,20 +117,20 @@ body {
 
 <body>
 
-<div class="header">🔥 URBAN FLOW RADIO 🔥</div>
+<div class="header">🇵🇪 URBAN FLOW RADIO 🇵🇪</div>
 
-<input class="search" id="buscador" placeholder="Buscar...">
+<input class="search" id="buscador" placeholder="Buscar radio...">
 
 <div class="categorias">
   <div class="cat" onclick="filtrar('all')">Todo</div>
   <div class="cat" onclick="filtrar('urban')">Urban</div>
-  <div class="cat" onclick="filtrar('baladasUSA')">Baladas USA</div>
-  <div class="cat" onclick="filtrar('baladasLATAM')">Baladas LATAM</div>
-  <div class="cat" onclick="filtrar('baladasEU')">Baladas Europa</div>
+  <div class="cat" onclick="filtrar('baladas')">Baladas</div>
+  <div class="cat" onclick="filtrar('reggae')">Reggae</div>
 </div>
 
 <div class="grid" id="grid"></div>
 
+<!-- PLAYER -->
 <div class="player">
   <img id="cover" src="https://via.placeholder.com/50">
   <div id="titulo">Nada sonando</div>
@@ -134,22 +144,21 @@ body {
 <script>
 const radios = [
 
-/* URBAN (los que funcionan) */
+/* 🔥 TUS RADIOS */
+{nombre:"Urban Radio", tipo:"urban", url:"https://stream.0nlineradio.com/urban"},
 {nombre:"Dance Wave", tipo:"urban", url:"https://dancewave.online/dance.mp3"},
 {nombre:"Radio Internacional", tipo:"urban", url:"https://streams.ilovemusic.de/iloveradio1.mp3"},
-{nombre:"Urban Radio", tipo:"urban", url:"https://stream.0nlineradio.com/urban"},
+{nombre:"Romantic Hits EU", tipo:"baladas", url:"https://stream.zeno.fm/0r0xa792kwzuv"},
 
-/* BALADAS USA */
-{nombre:"Soft Rock Radio", tipo:"baladasUSA", url:"https://stream.zeno.fm/7g1p9h8tkwzuv"},
-{nombre:"Love Songs FM", tipo:"baladasUSA", url:"https://stream.zeno.fm/9s7z1k5f8wzuv"},
+/* 💖 BALADAS */
+{nombre:"Love Songs FM", tipo:"baladas", url:"https://stream.zeno.fm/9s7z1k5f8wzuv"},
+{nombre:"Soft Rock Ballads", tipo:"baladas", url:"https://stream.zeno.fm/7g1p9h8tkwzuv"},
+{nombre:"Romantic Radio", tipo:"baladas", url:"https://stream.zeno.fm/f3y6q8zq5wzuv"},
 
-/* BALADAS LATAM */
-{nombre:"Baladas Románticas", tipo:"baladasLATAM", url:"https://stream.zeno.fm/f3y6q8zq5wzuv"},
-{nombre:"Amor FM Latino", tipo:"baladasLATAM", url:"https://stream.zeno.fm/8u0zv4kz2wzuv"},
-
-/* BALADAS EUROPA */
-{nombre:"Euro Love Radio", tipo:"baladasEU", url:"https://stream.zeno.fm/d3y6f9r6kwzuv"},
-{nombre:"Romantic Hits EU", tipo:"baladasEU", url:"https://stream.zeno.fm/0r0xa792kwzuv"}
+/* 🌴 REGGAE */
+{nombre:"Reggae141", tipo:"reggae", url:"https://stream.zeno.fm/1g8z9qk2kwzuv"},
+{nombre:"BigUp Radio Reggae", tipo:"reggae", url:"https://bigupradio1.cdnstream.com/5187_128"},
+{nombre:"Reggae Nation", tipo:"reggae", url:"https://stream.zeno.fm/d3y6f9r6kwzuv"}
 
 ];
 
@@ -164,7 +173,7 @@ let listaActual = radios;
 
 /* LOGO */
 function logo(nombre){
-  return `https://ui-avatars.com/api/?name=${encodeURIComponent(nombre)}&background=ff9900&color=fff`;
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(nombre)}&background=ff0000&color=fff`;
 }
 
 /* RENDER */
