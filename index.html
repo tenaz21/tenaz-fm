@@ -3,87 +3,112 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Radios Peruanas PRO MAX</title>
+<title>TENAZ FM</title>
+
 <style>
-  body {
-    margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background: #121212;
-    color: #fff;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: #121212;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
-  h1 {
-    margin-top: 20px;
-    font-size: 2rem;
-    text-align: center;
-  }
+/* TITULO PRO */
+.titulo {
+  margin-top: 20px;
+  font-size: 2.5rem;
+  text-align: center;
+  font-weight: 900;
+  letter-spacing: 2px;
+  background: linear-gradient(90deg, #00ffcc, #00aaff, #ff00cc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 20px rgba(0,255,204,0.6);
+}
 
-  #radiosContainer {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 20px;
-    width: 90%;
-    max-width: 1000px;
-    margin-top: 20px;
-  }
+/* BUSCADOR */
+#buscador {
+  margin-top: 15px;
+  padding: 10px;
+  width: 80%;
+  max-width: 400px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+}
 
-  .radio {
-    background: #1f1f1f;
-    border-radius: 12px;
-    overflow: hidden;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-    text-align: center;
-    padding: 10px;
-  }
+/* GRID */
+#radiosContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 20px;
+  width: 90%;
+  max-width: 1000px;
+  margin-top: 20px;
+}
 
-  .radio:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 15px #00ffcc;
-  }
+/* TARJETAS */
+.radio {
+  background: #1f1f1f;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  text-align: center;
+  padding: 10px;
+}
 
-  .radio img {
-    width: 100%;
-    height: 100px;
-    object-fit: cover;
-    border-radius: 8px;
-  }
+.radio:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px #00ffcc;
+}
 
-  .radio p {
-    margin-top: 8px;
-    font-weight: bold;
-    font-size: 0.9rem;
-  }
+.radio:active {
+  transform: scale(0.95);
+}
 
-  #currentRadio {
-    margin-top: 30px;
-    background: #1f1f1f;
-    padding: 15px 20px;
-    border-radius: 12px;
-    width: 90%;
-    max-width: 500px;
-    text-align: center;
-    box-shadow: 0 0 10px #00ffcc;
-  }
+.radio img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+}
 
-  #player {
-    margin-top: 15px;
-    width: 100%;
-    border-radius: 8px;
-  }
+.radio p {
+  margin-top: 8px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
 
-  @media (max-width: 600px) {
-    .radio img { height: 80px; }
-    h1 { font-size: 1.5rem; }
-  }
+/* PLAYER */
+#currentRadio {
+  margin-top: 30px;
+  background: #1f1f1f;
+  padding: 15px 20px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  text-align: center;
+  box-shadow: 0 0 10px #00ffcc;
+}
+
+#player {
+  margin-top: 15px;
+  width: 100%;
+  border-radius: 8px;
+}
 </style>
 </head>
+
 <body>
 
-<h1>🎵 Radios Peruanas PRO MAX</h1>
+<h1 class="titulo">TENAZ FM 🔥</h1>
+
+<input type="text" id="buscador" placeholder="Buscar radio...">
 
 <div id="radiosContainer"></div>
 
@@ -94,6 +119,7 @@
 
 <script>
 const radios = [
+
   {nombre:"RPP Noticias", img:"https://i.imgur.com/6z4KQ9B.png", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/RPP_SC"},
   {nombre:"Radio Moda", img:"https://i.imgur.com/VK0kS0F.png", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/MODA_SC"},
   {nombre:"Studio 92", img:"https://i.imgur.com/YKXxw6T.png", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/STUDIO92_SC"},
@@ -102,33 +128,57 @@ const radios = [
   {nombre:"Panamericana Radio", img:"https://i.imgur.com/QkK0G7G.png", url:"https://cdnhd.iblups.com/hls/ptv2radio.m3u8"},
   {nombre:"Top Latino Radio", img:"https://i.imgur.com/emFmJsg.png", url:"http://online.radiodifusion.net:1935/livetv/latinoSD.stream/playlist.m3u8"},
   {nombre:"Radio Exitosa", img:"https://i.imgur.com/XpQKZ8S.png", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/EXITOSA_SC"},
-  {nombre:"Radio Internacional", img:"https://via.placeholder.com/150?text=Music", url:"https://streams.ilovemusic.de/iloveradio1.mp3"},
-  {nombre:"Dance Wave", img:"https://via.placeholder.com/150?text=Dance", url:"https://dancewave.online/dance.mp3"}
+
+  {nombre:"La Karibeña", img:"https://i.imgur.com/W6XxZ3F.png", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/KARIBENA_SC"},
+  {nombre:"Radio Felicidad", img:"https://i.imgur.com/z4FQh1y.png", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/FELICIDAD_SC"},
+  {nombre:"Radiomar", img:"https://i.imgur.com/qZyQX0l.png", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/RADIOMAR_SC"},
+  {nombre:"Z Rock & Pop", img:"https://i.imgur.com/WVn5K2Y.png", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/ZROCK_SC"},
+  {nombre:"Oxígeno", img:"https://i.imgur.com/Nv1ZP6X.png", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/OXIGENO_SC"},
+  {nombre:"Corazón", img:"https://i.imgur.com/1W7mVbV.png", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/CORAZON_SC"},
+  {nombre:"Radio Disney Perú", img:"https://i.imgur.com/Mm0c9zC.png", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/DISNEY_SC"},
+  {nombre:"Capital", img:"https://i.imgur.com/v8Zz0zG.png", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/CAPITAL_SC"}
+
 ];
 
 const container = document.getElementById('radiosContainer');
 const player = document.getElementById('player');
 const radioName = document.getElementById('radioName');
 
-// Cargar tarjetas de radios
+/* CREAR TARJETAS */
 radios.forEach(radio => {
   const div = document.createElement('div');
   div.className = 'radio';
-  div.innerHTML = `<img src="${radio.img}" alt="${radio.nombre}"><p>${radio.nombre}</p>`;
+
+  div.innerHTML = `
+    <img src="${radio.img}" onerror="this.src='https://via.placeholder.com/150?text=Radio'">
+    <p>${radio.nombre}</p>
+  `;
+
   div.addEventListener('click', () => {
     player.src = radio.url;
     player.play();
     radioName.textContent = radio.nombre;
   });
+
   container.appendChild(div);
 });
 
-// Reproducir la primera radio al cargar
+/* BUSCADOR */
+document.getElementById('buscador').addEventListener('input', e => {
+  const texto = e.target.value.toLowerCase();
+
+  document.querySelectorAll('.radio').forEach(r => {
+    r.style.display = r.textContent.toLowerCase().includes(texto) ? 'block' : 'none';
+  });
+});
+
+/* AUTO PLAY */
 if (radios.length > 0) {
   player.src = radios[0].url;
   radioName.textContent = radios[0].nombre;
+
   player.play().catch(() => {
-    console.log("Autoplay bloqueado por el navegador, haz clic para reproducir.");
+    console.log("Autoplay bloqueado");
   });
 }
 </script>
