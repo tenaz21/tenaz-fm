@@ -13,7 +13,6 @@ body {
   color: white;
 }
 
-/* LOGO */
 .logo {
   display: flex;
   justify-content: center;
@@ -30,7 +29,6 @@ body {
   to { box-shadow: 0 0 30px orange; }
 }
 
-/* BUSCADOR */
 .search {
   width: 85%;
   margin: auto;
@@ -40,7 +38,6 @@ body {
   display: block;
 }
 
-/* GRID */
 .grid {
   display: grid;
   grid-template-columns: repeat(2,1fr);
@@ -65,7 +62,6 @@ body {
   border-radius: 10px;
 }
 
-/* FAVORITOS */
 .fav {
   position: absolute;
   top: 5px;
@@ -73,7 +69,6 @@ body {
   font-size: 18px;
 }
 
-/* PLAYER */
 .player {
   position: fixed;
   bottom: 0;
@@ -135,17 +130,16 @@ let radios = [
 {nombre:"I Love Radio", url:"https://streams.ilovemusic.de/iloveradio1.mp3"},
 {nombre:"Romantic Hits EU", url:"https://stream.zeno.fm/0r0xa792kwzuv"},
 
-/* 🇵🇪 PERÚ (FUNCIONALES) */
-{nombre:"Ritmo Romántica", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/CRP_RIT_SC.mp3"},
-{nombre:"Radio Moda", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/CRP_MOD_SC.mp3"},
-{nombre:"Radiomar", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/CRP_MAR_SC.mp3"},
-{nombre:"La Karibeña", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/CRP_KAR_SC.mp3"},
-{nombre:"Oasis", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/CRP_OAS_SC.mp3"},
-{nombre:"RPP Noticias", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/RPP_SC.mp3"},
+/* 🇵🇪 PERÚ (FUNCIONAN EN WEB) */
+{nombre:"Exitosa Perú", url:"https://cu.onliv3.com/live/exitosa.m3u8"},
+{nombre:"Radio Nacional Perú", url:"https://stream.radionacional.gob.pe/nacional.mp3"},
+{nombre:"La Zona Radio", url:"https://stream.zeno.fm/8t0w9nq8qg0uv"},
+{nombre:"Radio Panamericana", url:"https://stream.zeno.fm/9q8nzk6h5f8uv"},
+{nombre:"Onda Digital Perú", url:"https://stream.zeno.fm/rcxg9z8h5f8uv"},
 
-/* 📡 EXTRA */
-{nombre:"Exitosa", url:"https://cu.onliv3.com/live/exitosa.m3u8"},
-{nombre:"Radio Nacional", url:"https://stream.radionacional.gob.pe/nacional.mp3"}
+/* 🔥 URBANO */
+{nombre:"Reggaeton Hits", url:"https://stream.zeno.fm/uk3m69v8u0hvv"},
+{nombre:"Trap Latino", url:"https://stream.zeno.fm/f3h5h0m9u0hvv"}
 
 ];
 
@@ -162,12 +156,10 @@ audio.setAttribute("playsinline", true);
 
 let hls;
 
-/* LOGO */
 function logo(nombre){
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(nombre)}&background=ff0000&color=fff`;
 }
 
-/* PLAYER */
 function playRadio(url){
 
   if(hls){
@@ -190,7 +182,6 @@ function playRadio(url){
   }
 }
 
-/* RENDER */
 function render(lista){
   grid.innerHTML = "";
 
@@ -230,13 +221,11 @@ function render(lista){
   });
 }
 
-/* BUSCADOR */
 document.getElementById("buscador").addEventListener("input", e => {
   const t = e.target.value.toLowerCase();
   render(radios.filter(r => r.nombre.toLowerCase().includes(t)));
 });
 
-/* PLAY / PAUSE */
 playBtn.onclick = () => {
   if(audio.paused){
     audio.play();
@@ -248,10 +237,9 @@ playBtn.onclick = () => {
 audio.onplay = () => playBtn.textContent = "⏸";
 audio.onpause = () => playBtn.textContent = "▶";
 
-/* VOLUMEN */
 vol.oninput = () => audio.volume = vol.value;
 
-/* AUTO RECONNECT (IMPORTANTE) */
+/* 🔥 AUTO RECONEXIÓN */
 audio.onerror = () => {
   setTimeout(() => {
     audio.load();
@@ -259,7 +247,6 @@ audio.onerror = () => {
   }, 3000);
 };
 
-/* INIT */
 render(radios);
 </script>
 
