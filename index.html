@@ -20,8 +20,10 @@ body {
 }
 
 .logo img {
-  width: 90%;
-  max-width: 320px;
+  width: 95%;
+  max-width: 500px;
+  border-radius: 15px;
+  box-shadow: 0 0 25px rgba(255,0,0,0.6);
 }
 
 /* BUSCADOR */
@@ -34,21 +36,21 @@ body {
   border: none;
 }
 
-/* CATEGORIAS */
-.categorias {
-  display: flex;
-  overflow-x: auto;
-  gap: 10px;
-  padding: 10px;
+/* BOTONES */
+.botones {
+  text-align: center;
+  margin: 10px;
 }
 
-.cat {
+.botones button {
+  padding: 8px 12px;
+  margin: 5px;
+  border: none;
+  border-radius: 20px;
   background: white;
   color: red;
-  padding: 8px 15px;
-  border-radius: 20px;
-  cursor: pointer;
   font-weight: bold;
+  cursor: pointer;
 }
 
 /* GRID */
@@ -57,7 +59,7 @@ body {
   grid-template-columns: repeat(2,1fr);
   gap: 12px;
   padding: 15px;
-  padding-bottom: 90px;
+  padding-bottom: 100px;
 }
 
 .radio {
@@ -109,18 +111,22 @@ body {
 
 <body>
 
-<!-- 🔥 LOGO (YA FUNCIONA) -->
+<!-- 🔥 LOGO -->
 <div class="logo">
-  <img src="https://i.imgur.com/4M34hi2.png">
+  <img src="logo.png" alt="Urban Flow Radio">
 </div>
 
-<input class="search" id="buscador" placeholder="Buscar radio...">
+<input class="search" id="buscador" placeholder="Buscar...">
 
-<div class="categorias">
-  <div class="cat" onclick="filtrar('all')">Todo</div>
-  <div class="cat" onclick="filtrar('urban')">Urban</div>
-  <div class="cat" onclick="filtrar('baladas')">Baladas</div>
+<!-- BOTONES NUEVOS -->
+<div class="botones">
+  <button onclick="modoRadios()">Radios</button>
+  <button onclick="subirMusica()">Tu Música</button>
+  <button onclick="cargarM3U()">Lista M3U</button>
 </div>
+
+<input type="file" id="fileMusica" accept="audio/*" multiple style="display:none">
+<input type="file" id="fileM3U" accept=".m3u" style="display:none">
 
 <div class="grid" id="grid"></div>
 
@@ -136,19 +142,16 @@ body {
 </div>
 
 <script>
-const radios = [
 
-/* 🔥 ESTABLES */
-{nombre:"Urban Radio", tipo:"urban", url:"https://stream.0nlineradio.com/urban"},
-{nombre:"Dance Wave", tipo:"urban", url:"https://dancewave.online/dance.mp3"},
-{nombre:"Radio Internacional", tipo:"urban", url:"https://streams.ilovemusic.de/iloveradio1.mp3"},
-
-/* 💖 BALADAS */
-{nombre:"Romantic Hits EU", tipo:"baladas", url:"https://stream.zeno.fm/0r0xa792kwzuv"},
-{nombre:"Love Songs FM", tipo:"baladas", url:"https://stream.zeno.fm/9s7z1k5f8wzuv"},
-{nombre:"Soft Rock Ballads", tipo:"baladas", url:"https://stream.zeno.fm/7g1p9h8tkwzuv"}
-
+/* 🔥 RADIOS ESTABLES */
+let radios = [
+{nombre:"Urban Radio", url:"https://stream.0nlineradio.com/urban"},
+{nombre:"Dance Wave", url:"https://dancewave.online/dance.mp3"},
+{nombre:"Radio Internacional", url:"https://streams.ilovemusic.de/iloveradio1.mp3"},
+{nombre:"Romantic Hits EU", url:"https://stream.zeno.fm/0r0xa792kwzuv"}
 ];
+
+let listaActual = radios;
 
 const grid = document.getElementById("grid");
 const audio = document.getElementById("audio");
@@ -157,9 +160,7 @@ const cover = document.getElementById("cover");
 const playBtn = document.getElementById("playBtn");
 const vol = document.getElementById("vol");
 
-let listaActual = radios;
-
-/* LOGO GENERADOR */
+/* LOGO */
 function logo(nombre){
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(nombre)}&background=ff0000&color=fff`;
 }
@@ -188,14 +189,6 @@ function render(lista){
   });
 }
 
-/* FILTRO */
-function filtrar(tipo){
-  if(tipo === "all") listaActual = radios;
-  else listaActual = radios.filter(r => r.tipo === tipo);
-
-  render(listaActual);
-}
-
 /* BUSCAR */
 document.getElementById("buscador").addEventListener("input", e => {
   const t = e.target.value.toLowerCase();
@@ -219,8 +212,58 @@ audio.onpause = () => playBtn.textContent = "▶";
 /* VOLUMEN */
 vol.oninput = () => audio.volume = vol.value;
 
-/* INIT */
+/* MODO RADIOS */
+function modoRadios(){
+  listaActual = radios;
+  render(listaActual);
+}
+
+/* 🎵 SUBIR MÚSICA */
+function subirMusica(){
+  document.getElementById("fileMusica").click();
+}
+
+document.getElementById("fileMusica").addEventListener("change", e => {
+  const files = Array.from(e.target.files);
+
+  listaActual = files.map(f => ({
+    nombre: f.name,
+    url: URL.createObjectURL(f)
+  }));
+
+  render(listaActual);
+});
+
+/* 📺 CARGAR M3U */
+function cargarM3U(){
+  document.getElementById("fileM3U").click();
+}
+
+document.getElementById("fileM3U").addEventListener("change", e => {
+  const file = e.target.files[0];
+  const reader = new FileReader();
+
+  reader.onload = function(event){
+    const contenido = event.target.result.split("\n");
+    listaActual = [];
+
+    for(let i=0;i<contenido.length;i++){
+      if(contenido[i].includes("#EXTINF")){
+        const nombre = contenido[i].split(",")[1];
+        const url = contenido[i+1];
+        listaActual.push({nombre, url});
+      }
+    }
+
+    render(listaActual);
+  };
+
+  reader.readAsText(file);
+});
+
+/* INICIO */
 render(radios);
+
 </script>
 
 </body>
