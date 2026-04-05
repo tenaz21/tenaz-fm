@@ -8,241 +8,168 @@
 <style>
 body {
   margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background: #121212;
-  color: #fff;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  font-family: sans-serif;
+  background: linear-gradient(#7a0000, #1a0000);
+  color: white;
 }
 
-/* TITULO */
-.titulo {
-  margin-top: 20px;
-  font-size: 2.5rem;
-  font-weight: 900;
-  background: linear-gradient(90deg, #00ffcc, #00aaff, #ff00cc);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+/* HEADER */
+.header {
+  text-align: center;
+  padding: 20px;
+  font-size: 28px;
+  font-weight: bold;
 }
 
 /* BUSCADOR */
-#buscador {
-  margin-top: 15px;
-  padding: 10px;
+.search {
   width: 80%;
-  max-width: 400px;
-  border-radius: 8px;
+  margin: auto;
+  display: block;
+  padding: 10px;
+  border-radius: 20px;
   border: none;
 }
 
+/* CATEGORIAS */
+.categorias {
+  display: flex;
+  overflow-x: auto;
+  gap: 10px;
+  padding: 15px;
+}
+
+.cat {
+  padding: 8px 15px;
+  background: #ff9800;
+  border-radius: 20px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
 /* GRID */
-#contenedor {
+.grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 15px;
-  width: 90%;
-  max-width: 900px;
-  margin-top: 20px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  padding: 15px;
 }
 
 .radio {
-  background: #1f1f1f;
-  border-radius: 10px;
-  padding: 10px;
+  background: #fff;
+  color: black;
+  border-radius: 15px;
   text-align: center;
+  padding: 10px;
   cursor: pointer;
-  position: relative;
-}
-
-.radio:hover {
-  box-shadow: 0 0 10px #00ffcc;
 }
 
 .radio img {
   width: 100%;
-  height: 90px;
-  border-radius: 8px;
-}
-
-/* FAVORITO */
-.fav {
-  position: absolute;
-  top: 5px;
-  right: 8px;
-  font-size: 18px;
-  cursor: pointer;
+  border-radius: 10px;
 }
 
 /* PLAYER */
-#playerBox {
-  margin-top: 25px;
-  background: #1f1f1f;
-  padding: 20px;
-  border-radius: 15px;
-  width: 90%;
-  max-width: 400px;
-  text-align: center;
-  box-shadow: 0 0 20px rgba(0,255,204,0.3);
-}
-
-#cover {
+.player {
+  position: fixed;
+  bottom: 0;
   width: 100%;
-  height: 180px;
-  border-radius: 12px;
+  background: #111;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.play-btn {
-  margin-top: 15px;
-  background: #00ffcc;
+.player img {
+  width: 50px;
+  border-radius: 10px;
+}
+
+.controls button {
+  background: orange;
   border: none;
   border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  font-size: 20px;
-  cursor: pointer;
-}
-
-/* VOLUMEN */
-.volume-box {
-  margin-top: 10px;
-}
-
-#volumen {
-  width: 150px;
+  padding: 10px;
+  margin: 5px;
+  font-size: 18px;
 }
 </style>
 </head>
 
 <body>
 
-<h1 class="titulo">TENAZ FM 🔥</h1>
+<div class="header">🇵🇪 TENAZ FM</div>
 
-<input type="text" id="buscador" placeholder="Buscar radio...">
+<input class="search" placeholder="Buscar radio...">
 
-<div id="contenedor"></div>
+<div class="categorias">
+  <div class="cat">Todas</div>
+  <div class="cat">Cumbia</div>
+  <div class="cat">Rock</div>
+  <div class="cat">Hip Hop</div>
+</div>
 
-<div id="playerBox">
-  <img id="cover" src="https://via.placeholder.com/300x200?text=TENAZ+FM">
-  <h3 id="tituloRadio">Selecciona una radio</h3>
+<div class="grid" id="grid"></div>
 
-  <button class="play-btn" onclick="togglePlay()">▶</button>
+<!-- PLAYER -->
+<div class="player">
+  <img id="cover" src="https://via.placeholder.com/50">
+  <div id="titulo">Nada sonando</div>
 
-  <div class="volume-box">
-    <span id="iconoVol">🔊</span><br>
-    <input type="range" id="volumen" min="0" max="1" step="0.01" value="1">
+  <div class="controls">
+    <button onclick="playPause()">▶</button>
   </div>
 
-  <audio id="player"></audio>
+  <audio id="audio"></audio>
 </div>
 
 <script>
 const radios = [
-
-{nombre:"Capital", img:"https://via.placeholder.com/150?text=Capital", url:"https://stream.zeno.fm/8u0zv4kz2wzuv"},
-{nombre:"Oxígeno", img:"https://via.placeholder.com/150?text=Oxigeno", url:"https://stream.zeno.fm/0r0xa792kwzuv"},
-{nombre:"Corazón", img:"https://via.placeholder.com/150?text=Corazon", url:"https://stream.zeno.fm/f3y6q8zq5wzuv"},
-
-{nombre:"Radio Internacional", img:"https://via.placeholder.com/150?text=Music", url:"https://streams.ilovemusic.de/iloveradio1.mp3"},
-{nombre:"Dance Wave", img:"https://via.placeholder.com/150?text=Dance", url:"https://dancewave.online/dance.mp3"},
-
-/* HIP HOP 🔥 */
-{nombre:"Hip Hop Hits", img:"https://via.placeholder.com/150?text=HipHop", url:"https://stream.zeno.fm/4wqre23fytzuv"},
-{nombre:"Rap FM", img:"https://via.placeholder.com/150?text=Rap", url:"https://stream.zeno.fm/7x8f7v6r8wzuv"},
-{nombre:"Urban Beats", img:"https://via.placeholder.com/150?text=Urban", url:"https://stream.zeno.fm/f8xw4k6x5wzuv"},
-{nombre:"Old School Hip Hop", img:"https://via.placeholder.com/150?text=90s", url:"https://stream.zeno.fm/3kz8p8y2kwzuv"}
-
+  {nombre:"Dance Wave", url:"https://dancewave.online/dance.mp3"},
+  {nombre:"Radio Internacional", url:"https://streams.ilovemusic.de/iloveradio1.mp3"},
+  {nombre:"Hip Hop Hits", url:"https://stream.zeno.fm/4wqre23fytzuv"},
+  {nombre:"Urban Beats", url:"https://stream.zeno.fm/f8xw4k6x5wzuv"}
 ];
 
-let favoritos = JSON.parse(localStorage.getItem("fav")) || [];
-
-const contenedor = document.getElementById("contenedor");
-const player = document.getElementById("player");
-const titulo = document.getElementById("tituloRadio");
-const cover = document.getElementById("cover");
-const btn = document.querySelector(".play-btn");
-const volumen = document.getElementById("volumen");
-const iconoVol = document.getElementById("iconoVol");
+const grid = document.getElementById("grid");
+const audio = document.getElementById("audio");
+const titulo = document.getElementById("titulo");
 
 let playing = false;
 
-/* MOSTRAR */
-function cargar(lista){
-  contenedor.innerHTML = "";
+/* CREAR RADIOS */
+radios.forEach(r => {
+  const div = document.createElement("div");
+  div.className = "radio";
 
-  lista.forEach(radio => {
+  div.innerHTML = `
+    <img src="https://via.placeholder.com/100">
+    <p>${r.nombre}</p>
+  `;
 
-    const esFav = favoritos.includes(radio.nombre);
+  div.onclick = () => {
+    audio.src = r.url;
+    audio.play();
+    titulo.textContent = r.nombre;
+    playing = true;
+  };
 
-    const div = document.createElement("div");
-    div.className = "radio";
-
-    div.innerHTML = `
-      <span class="fav">${esFav ? "❤️" : "🤍"}</span>
-      <img src="${radio.img}">
-      <p>${radio.nombre}</p>
-    `;
-
-    /* CLICK RADIO */
-    div.onclick = () => {
-      player.src = radio.url;
-      titulo.textContent = radio.nombre;
-      cover.src = radio.img;
-      player.play();
-      btn.innerHTML = "⏸";
-      playing = true;
-    };
-
-    /* FAVORITO */
-    div.querySelector(".fav").onclick = (e) => {
-      e.stopPropagation();
-
-      if(esFav){
-        favoritos = favoritos.filter(f => f !== radio.nombre);
-      } else {
-        favoritos.push(radio.nombre);
-      }
-
-      localStorage.setItem("fav", JSON.stringify(favoritos));
-      cargar(radios);
-    };
-
-    contenedor.appendChild(div);
-  });
-}
-
-/* BUSCADOR */
-document.getElementById("buscador").addEventListener("input", e => {
-  const t = e.target.value.toLowerCase();
-  cargar(radios.filter(r => r.nombre.toLowerCase().includes(t)));
+  grid.appendChild(div);
 });
 
 /* PLAY */
-function togglePlay(){
-  if(!player.src) return;
+function playPause(){
+  if(!audio.src) return;
 
   if(playing){
-    player.pause();
-    btn.innerHTML = "▶";
+    audio.pause();
   } else {
-    player.play();
-    btn.innerHTML = "⏸";
+    audio.play();
   }
 
   playing = !playing;
 }
-
-/* VOLUMEN */
-volumen.addEventListener("input", () => {
-  player.volume = volumen.value;
-
-  if(volumen.value == 0) iconoVol.textContent = "🔇";
-  else if(volumen.value < 0.5) iconoVol.textContent = "🔉";
-  else iconoVol.textContent = "🔊";
-});
-
-/* INICIO */
-cargar(radios);
 </script>
 
 </body>
