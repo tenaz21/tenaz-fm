@@ -65,7 +65,7 @@ body {
   border-radius: 10px;
 }
 
-/* FAVORITO */
+/* FAVORITOS */
 .fav {
   position: absolute;
   top: 5px;
@@ -107,7 +107,6 @@ body {
 
 <body>
 
-<!-- LOGO -->
 <div class="logo">
   <img src="logo.png">
 </div>
@@ -116,7 +115,6 @@ body {
 
 <div class="grid" id="grid"></div>
 
-<!-- PLAYER -->
 <div class="player">
   <img id="cover" src="https://via.placeholder.com/50">
   <div id="titulo">Nada sonando</div>
@@ -127,15 +125,20 @@ body {
   <audio id="audio"></audio>
 </div>
 
+<!-- HLS -->
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
 <script>
 let radios = [
 
-/* 🔥 RADIOS QUE FUNCIONAN */
-{nombre:"Radio Nueva 🔥", url:"https://pe-p3-p-e-fz2-audio.cdn.mdstrm.com/live-audio-aw/6839e2376607bdf6b2fcde27/dH79Tnk8vQw-355082578-4992.aac"},
+/* 🔥 TUS RADIOS BUENAS */
 {nombre:"Urban Radio", url:"https://stream.0nlineradio.com/urban"},
 {nombre:"Dance Wave", url:"https://dancewave.online/dance.mp3"},
 {nombre:"Radio Internacional", url:"https://streams.ilovemusic.de/iloveradio1.mp3"},
-{nombre:"Romantic Hits EU", url:"https://stream.zeno.fm/0r0xa792kwzuv"}
+{nombre:"Romantic Hits EU", url:"https://stream.zeno.fm/0r0xa792kwzuv"},
+
+/* ⚠️ RADIO EXTRA (PUEDE FALLAR) */
+{nombre:"Radio HLS (Test)", url:"https://pe-p2-p-e-ep1-audio.cdn.mdstrm.com/live-audio-aw/6839e2376607bdf6b2fcde27/playlist.m3u8"}
 
 ];
 
@@ -148,9 +151,34 @@ const cover = document.getElementById("cover");
 const playBtn = document.getElementById("playBtn");
 const vol = document.getElementById("vol");
 
-/* LOGO RADIO */
+let hls;
+
+/* LOGO */
 function logo(nombre){
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(nombre)}&background=ff0000&color=fff`;
+}
+
+/* PLAYER INTELIGENTE */
+function playRadio(url){
+
+  if(hls){
+    hls.destroy();
+  }
+
+  if(url.includes(".m3u8")){
+    if(Hls.isSupported()){
+      hls = new Hls();
+      hls.loadSource(url);
+      hls.attachMedia(audio);
+      hls.on(Hls.Events.MANIFEST_PARSED, () => audio.play());
+    } else {
+      audio.src = url;
+      audio.play();
+    }
+  } else {
+    audio.src = url;
+    audio.play();
+  }
 }
 
 /* RENDER */
@@ -170,15 +198,12 @@ function render(lista){
       <p>${r.nombre}</p>
     `;
 
-    /* PLAY */
     div.onclick = () => {
-      audio.src = r.url;
-      audio.play();
+      playRadio(r.url);
       titulo.textContent = r.nombre;
       cover.src = logo(r.nombre);
     };
 
-    /* FAVORITO */
     div.querySelector(".fav").onclick = (e) => {
       e.stopPropagation();
 
@@ -217,7 +242,7 @@ audio.onpause = () => playBtn.textContent = "▶";
 /* VOLUMEN */
 vol.oninput = () => audio.volume = vol.value;
 
-/* INICIO */
+/* INIT */
 render(radios);
 </script>
 
