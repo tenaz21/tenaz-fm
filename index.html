@@ -20,13 +20,11 @@ body {
 .titulo {
   margin-top: 20px;
   font-size: 2.5rem;
-  text-align: center;
   font-weight: 900;
   letter-spacing: 2px;
   background: linear-gradient(90deg, #00ffcc, #00aaff, #ff00cc);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-shadow: 0 0 20px rgba(0,255,204,0.6);
 }
 
 /* BUSCADOR */
@@ -37,69 +35,57 @@ body {
   max-width: 400px;
   border-radius: 8px;
   border: none;
-  outline: none;
-  font-size: 1rem;
+}
+
+/* BOTONES */
+.botones {
+  margin-top: 10px;
+}
+
+button {
+  margin: 5px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  background: #00ffcc;
+  cursor: pointer;
+  font-weight: bold;
 }
 
 /* GRID */
-#radiosContainer {
+#contenedor {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 15px;
   width: 90%;
   max-width: 1000px;
   margin-top: 20px;
 }
 
-/* TARJETAS */
-.radio {
+.item {
   background: #1f1f1f;
-  border-radius: 12px;
-  overflow: hidden;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-  text-align: center;
+  border-radius: 10px;
   padding: 10px;
+  cursor: pointer;
+  text-align: center;
 }
 
-.radio:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 15px #00ffcc;
-}
-
-.radio:active {
-  transform: scale(0.95);
-}
-
-.radio img {
+.item img {
   width: 100%;
-  height: 100px;
+  height: 90px;
   object-fit: cover;
   border-radius: 8px;
 }
 
-.radio p {
-  margin-top: 8px;
-  font-weight: bold;
-  font-size: 0.9rem;
-}
-
 /* PLAYER */
-#currentRadio {
-  margin-top: 30px;
+#playerBox {
+  margin-top: 20px;
   background: #1f1f1f;
-  padding: 15px 20px;
-  border-radius: 12px;
+  padding: 15px;
+  border-radius: 10px;
   width: 90%;
   max-width: 500px;
   text-align: center;
-  box-shadow: 0 0 10px #00ffcc;
-}
-
-#player {
-  margin-top: 15px;
-  width: 100%;
-  border-radius: 8px;
 }
 </style>
 </head>
@@ -108,80 +94,109 @@ body {
 
 <h1 class="titulo">TENAZ FM 🔥</h1>
 
-<input type="text" id="buscador" placeholder="Buscar radio...">
+<input type="text" id="buscador" placeholder="Buscar canal o radio...">
 
-<div id="radiosContainer"></div>
+<div class="botones">
+  <button onclick="modoRadios()">Radios</button>
+  <button onclick="modoTV()">TV (M3U)</button>
+</div>
 
-<div id="currentRadio">
-  <h2 id="radioName">Cargando...</h2>
-  <audio id="player" controls autoplay></audio>
+<!-- cargar archivo -->
+<input type="file" id="fileInput" accept=".m3u">
+
+<div id="contenedor"></div>
+
+<div id="playerBox">
+  <h3 id="tituloActual">Selecciona algo</h3>
+  <video id="player" controls width="100%"></video>
 </div>
 
 <script>
+let lista = [];
+const contenedor = document.getElementById("contenedor");
+const player = document.getElementById("player");
+const titulo = document.getElementById("tituloActual");
+
+/* RADIOS QUE SI FUNCIONAN */
 const radios = [
-
-  {nombre:"RPP Noticias", img:"https://i.imgur.com/6z4KQ9B.png", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/RPP_SC"},
-  {nombre:"Radio Moda", img:"https://i.imgur.com/VK0kS0F.png", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/MODA_SC"},
-  {nombre:"Studio 92", img:"https://i.imgur.com/YKXxw6T.png", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/STUDIO92_SC"},
-  {nombre:"Radio Oasis", img:"https://i.imgur.com/2Zs7XbP.png", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/OASIS_SC"},
-  {nombre:"La Mega", img:"https://i.imgur.com/0KFBHTB.png", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/MEGA_SC"},
-  {nombre:"Panamericana Radio", img:"https://i.imgur.com/QkK0G7G.png", url:"https://cdnhd.iblups.com/hls/ptv2radio.m3u8"},
-  {nombre:"Top Latino Radio", img:"https://i.imgur.com/emFmJsg.png", url:"http://online.radiodifusion.net:1935/livetv/latinoSD.stream/playlist.m3u8"},
-  {nombre:"Radio Exitosa", img:"https://i.imgur.com/XpQKZ8S.png", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/EXITOSA_SC"},
-
-  {nombre:"La Karibeña", img:"https://i.imgur.com/W6XxZ3F.png", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/KARIBENA_SC"},
-  {nombre:"Radio Felicidad", img:"https://i.imgur.com/z4FQh1y.png", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/FELICIDAD_SC"},
-  {nombre:"Radiomar", img:"https://i.imgur.com/qZyQX0l.png", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/RADIOMAR_SC"},
-  {nombre:"Z Rock & Pop", img:"https://i.imgur.com/WVn5K2Y.png", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/ZROCK_SC"},
-  {nombre:"Oxígeno", img:"https://i.imgur.com/Nv1ZP6X.png", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/OXIGENO_SC"},
-  {nombre:"Corazón", img:"https://i.imgur.com/1W7mVbV.png", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/CORAZON_SC"},
-  {nombre:"Radio Disney Perú", img:"https://i.imgur.com/Mm0c9zC.png", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/DISNEY_SC"},
-  {nombre:"Capital", img:"https://i.imgur.com/v8Zz0zG.png", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/CAPITAL_SC"}
-
+{nombre:"Dance Wave", url:"https://dancewave.online/dance.mp3"},
+{nombre:"Radio Internacional", url:"https://streams.ilovemusic.de/iloveradio1.mp3"},
+{nombre:"Reggaeton Hits", url:"https://stream.zeno.fm/8u0zv4kz2wzuv"},
+{nombre:"Rock FM", url:"https://stream.zeno.fm/0r0xa792kwzuv"}
 ];
 
-const container = document.getElementById('radiosContainer');
-const player = document.getElementById('player');
-const radioName = document.getElementById('radioName');
+/* MOSTRAR LISTA */
+function mostrar(data){
+  contenedor.innerHTML = "";
 
-/* CREAR TARJETAS */
-radios.forEach(radio => {
-  const div = document.createElement('div');
-  div.className = 'radio';
+  data.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "item";
 
-  div.innerHTML = `
-    <img src="${radio.img}" onerror="this.src='https://via.placeholder.com/150?text=Radio'">
-    <p>${radio.nombre}</p>
-  `;
+    div.innerHTML = `
+      <img src="https://via.placeholder.com/150?text=${item.nombre}">
+      <p>${item.nombre}</p>
+    `;
 
-  div.addEventListener('click', () => {
-    player.src = radio.url;
-    player.play();
-    radioName.textContent = radio.nombre;
-  });
+    div.onclick = () => {
+      player.src = item.url;
+      player.play();
+      titulo.textContent = item.nombre;
+    };
 
-  container.appendChild(div);
-});
-
-/* BUSCADOR */
-document.getElementById('buscador').addEventListener('input', e => {
-  const texto = e.target.value.toLowerCase();
-
-  document.querySelectorAll('.radio').forEach(r => {
-    r.style.display = r.textContent.toLowerCase().includes(texto) ? 'block' : 'none';
-  });
-});
-
-/* AUTO PLAY */
-if (radios.length > 0) {
-  player.src = radios[0].url;
-  radioName.textContent = radios[0].nombre;
-
-  player.play().catch(() => {
-    console.log("Autoplay bloqueado");
+    contenedor.appendChild(div);
   });
 }
+
+/* MODOS */
+function modoRadios(){
+  lista = radios;
+  mostrar(lista);
+}
+
+function modoTV(){
+  mostrar(lista);
+}
+
+/* BUSCADOR */
+document.getElementById("buscador").addEventListener("input", e => {
+  const texto = e.target.value.toLowerCase();
+  const filtrado = lista.filter(x => x.nombre.toLowerCase().includes(texto));
+  mostrar(filtrado);
+});
+
+/* LEER M3U */
+document.getElementById("fileInput").addEventListener("change", function(e){
+  const file = e.target.files[0];
+  const reader = new FileReader();
+
+  reader.onload = function(event){
+    const contenido = event.target.result;
+    const lineas = contenido.split("\n");
+
+    lista = [];
+
+    for(let i=0; i<lineas.length; i++){
+      if(lineas[i].includes("#EXTINF")){
+        const nombre = lineas[i].split(",")[1];
+        const url = lineas[i+1];
+
+        lista.push({nombre, url});
+      }
+    }
+
+    mostrar(lista);
+  };
+
+  reader.readAsText(file);
+});
+
+/* INICIO */
+modoRadios();
 </script>
+
+</body>
+</html>
 
 </body>
 </html>
