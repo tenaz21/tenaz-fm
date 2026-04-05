@@ -16,7 +16,7 @@ body {
   align-items: center;
 }
 
-/* TITULO PRO */
+/* TITULO */
 .titulo {
   margin-top: 20px;
   font-size: 2.5rem;
@@ -35,57 +35,86 @@ body {
   max-width: 400px;
   border-radius: 8px;
   border: none;
-}
-
-/* BOTONES */
-.botones {
-  margin-top: 10px;
-}
-
-button {
-  margin: 5px;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 6px;
-  background: #00ffcc;
-  cursor: pointer;
-  font-weight: bold;
+  outline: none;
+  font-size: 1rem;
 }
 
 /* GRID */
 #contenedor {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 15px;
   width: 90%;
-  max-width: 1000px;
+  max-width: 900px;
   margin-top: 20px;
 }
 
-.item {
+.radio {
   background: #1f1f1f;
   border-radius: 10px;
   padding: 10px;
-  cursor: pointer;
   text-align: center;
+  cursor: pointer;
+  transition: 0.2s;
 }
 
-.item img {
+.radio:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px #00ffcc;
+}
+
+.radio img {
   width: 100%;
   height: 90px;
-  object-fit: cover;
   border-radius: 8px;
+  object-fit: cover;
 }
 
-/* PLAYER */
+/* 🎧 PLAYER PRO */
 #playerBox {
-  margin-top: 20px;
-  background: #1f1f1f;
-  padding: 15px;
-  border-radius: 10px;
+  margin-top: 25px;
+  background: linear-gradient(145deg, #1f1f1f, #181818);
+  padding: 20px;
+  border-radius: 15px;
   width: 90%;
-  max-width: 500px;
+  max-width: 400px;
   text-align: center;
+  box-shadow: 0 0 20px rgba(0,255,204,0.3);
+}
+
+#cover {
+  width: 100%;
+  height: 180px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+#tituloRadio {
+  margin-top: 10px;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+/* BOTON PLAY */
+.play-btn {
+  margin-top: 15px;
+  background: #00ffcc;
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 0 15px #00ffcc;
+  transition: 0.2s;
+}
+
+.play-btn:hover {
+  transform: scale(1.1);
+}
+
+audio {
+  display: none;
 }
 </style>
 </head>
@@ -94,109 +123,117 @@ button {
 
 <h1 class="titulo">TENAZ FM 🔥</h1>
 
-<input type="text" id="buscador" placeholder="Buscar canal o radio...">
-
-<div class="botones">
-  <button onclick="modoRadios()">Radios</button>
-  <button onclick="modoTV()">TV (M3U)</button>
-</div>
-
-<!-- cargar archivo -->
-<input type="file" id="fileInput" accept=".m3u">
+<input type="text" id="buscador" placeholder="Buscar radio...">
 
 <div id="contenedor"></div>
 
+<!-- 🎧 PLAYER -->
 <div id="playerBox">
-  <h3 id="tituloActual">Selecciona algo</h3>
-  <video id="player" controls width="100%"></video>
+  <img id="cover" src="https://via.placeholder.com/300x200?text=TENAZ+FM">
+  <div id="tituloRadio">Selecciona una radio</div>
+  <button class="play-btn" onclick="togglePlay()">▶</button>
+  <audio id="player"></audio>
 </div>
 
 <script>
-let lista = [];
-const contenedor = document.getElementById("contenedor");
-const player = document.getElementById("player");
-const titulo = document.getElementById("tituloActual");
-
-/* RADIOS QUE SI FUNCIONAN */
 const radios = [
-{nombre:"Dance Wave", url:"https://dancewave.online/dance.mp3"},
-{nombre:"Radio Internacional", url:"https://streams.ilovemusic.de/iloveradio1.mp3"},
-{nombre:"Reggaeton Hits", url:"https://stream.zeno.fm/8u0zv4kz2wzuv"},
-{nombre:"Rock FM", url:"https://stream.zeno.fm/0r0xa792kwzuv"}
+
+  {
+    nombre:"Capital",
+    img:"https://upload.wikimedia.org/wikipedia/commons/6/6c/Radio_Capital_Peru.png",
+    url:"https://stream.zeno.fm/8u0zv4kz2wzuv"
+  },
+
+  {
+    nombre:"Oxígeno",
+    img:"https://upload.wikimedia.org/wikipedia/commons/3/3a/Radio_Oxigeno_logo.png",
+    url:"https://stream.zeno.fm/0r0xa792kwzuv"
+  },
+
+  {
+    nombre:"Corazón",
+    img:"https://upload.wikimedia.org/wikipedia/commons/4/4e/Radio_Corazon_logo.png",
+    url:"https://stream.zeno.fm/f3y6q8zq5wzuv"
+  },
+
+  {
+    nombre:"Radio Internacional",
+    img:"https://via.placeholder.com/150?text=Music",
+    url:"https://streams.ilovemusic.de/iloveradio1.mp3"
+  },
+
+  {
+    nombre:"Dance Wave",
+    img:"https://via.placeholder.com/150?text=Dance",
+    url:"https://dancewave.online/dance.mp3"
+  }
+
 ];
 
-/* MOSTRAR LISTA */
-function mostrar(data){
+const contenedor = document.getElementById("contenedor");
+const player = document.getElementById("player");
+const titulo = document.getElementById("tituloRadio");
+const cover = document.getElementById("cover");
+const btn = document.querySelector(".play-btn");
+
+let playing = false;
+
+/* CREAR TARJETAS */
+function cargarRadios(lista){
   contenedor.innerHTML = "";
 
-  data.forEach(item => {
+  lista.forEach(radio => {
+
     const div = document.createElement("div");
-    div.className = "item";
+    div.className = "radio";
 
     div.innerHTML = `
-      <img src="https://via.placeholder.com/150?text=${item.nombre}">
-      <p>${item.nombre}</p>
+      <img src="${radio.img}" onerror="this.src='https://via.placeholder.com/150?text=Radio'">
+      <p>${radio.nombre}</p>
     `;
 
     div.onclick = () => {
-      player.src = item.url;
+      player.src = radio.url;
+      titulo.textContent = radio.nombre;
+      cover.src = radio.img;
       player.play();
-      titulo.textContent = item.nombre;
+      btn.innerHTML = "⏸";
+      playing = true;
     };
 
     contenedor.appendChild(div);
   });
 }
 
-/* MODOS */
-function modoRadios(){
-  lista = radios;
-  mostrar(lista);
-}
-
-function modoTV(){
-  mostrar(lista);
-}
-
 /* BUSCADOR */
 document.getElementById("buscador").addEventListener("input", e => {
   const texto = e.target.value.toLowerCase();
-  const filtrado = lista.filter(x => x.nombre.toLowerCase().includes(texto));
-  mostrar(filtrado);
+
+  const filtrado = radios.filter(r =>
+    r.nombre.toLowerCase().includes(texto)
+  );
+
+  cargarRadios(filtrado);
 });
 
-/* LEER M3U */
-document.getElementById("fileInput").addEventListener("change", function(e){
-  const file = e.target.files[0];
-  const reader = new FileReader();
+/* PLAY / PAUSE */
+function togglePlay(){
+  if(!player.src) return;
 
-  reader.onload = function(event){
-    const contenido = event.target.result;
-    const lineas = contenido.split("\n");
+  if(playing){
+    player.pause();
+    btn.innerHTML = "▶";
+  } else {
+    player.play();
+    btn.innerHTML = "⏸";
+  }
 
-    lista = [];
-
-    for(let i=0; i<lineas.length; i++){
-      if(lineas[i].includes("#EXTINF")){
-        const nombre = lineas[i].split(",")[1];
-        const url = lineas[i+1];
-
-        lista.push({nombre, url});
-      }
-    }
-
-    mostrar(lista);
-  };
-
-  reader.readAsText(file);
-});
+  playing = !playing;
+}
 
 /* INICIO */
-modoRadios();
+cargarRadios(radios);
 </script>
-
-</body>
-</html>
 
 </body>
 </html>
