@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TENAZ F.M.</title>
+
+<style>
+body {
+  margin:0;
+  background:#0b0b0b;
+  color:white;
+  font-family:Arial;
+}
+
+header {
+  display:flex;
+  align-items:center;
+  padding:10px;
+  background:#111;
+  gap:10px;
+}
+
+header img { height:40px; }
+
+.search { padding:10px; }
+
+input {
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+  border:none;
+}
+
+.container {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+  gap:10px;
+  padding:10px;
+}
+
+.card {
+  background:#1c1c1c;
+  border-radius:12px;
+  text-align:center;
+  cursor:pointer;
+  transition:0.3s;
+  position:relative;
+}
+
+.card:hover { transform:scale(1.05); }
+
+.card img {
+  width:100%;
+  height:100px;
+  object-fit:cover;
+  border-radius:10px 10px 0 0;
+}
+
+.fav {
+  position:absolute;
+  top:5px;
+  right:5px;
+  font-size:18px;
+}
+
+.player-bar {
+  position:fixed;
+  bottom:0;
+  width:100%;
+  background:#111;
+  padding:10px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+button {
+  padding:8px 12px;
+  border:none;
+  border-radius:8px;
+  background:#1db954;
+  color:white;
+  cursor:pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+  <img src="https://cdn-icons-png.flaticon.com/512/727/727245.png">
+  <h2>🎧 TENAZ F.M.</h2>
+</header>
+
+<div class="search">
+  <input type="text" id="buscador" placeholder="Buscar radio...">
+</div>
+
+<div class="container" id="lista"></div>
+
+<div class="player-bar">
+  <span id="actual">Nada reproduciendo</span>
+  <div>
+    <button onclick="play()">▶</button>
+    <button onclick="stop()">⏹</button>
+  </div>
+</div>
+
+<audio id="player"></audio>
+
+<script>
+
+const radios = [
+{nombre:"Top Latino", img:"https://i.imgur.com/emFmJsg.png", url:"http://online.radiodifusion.net:1935/livetv/latinoSD.stream/playlist.m3u8"},
+{nombre:"Los 40", img:"https://upload.wikimedia.org/wikipedia/commons/7/7a/Los_40_logo.svg", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/LOS40_SC"},
+{nombre:"Radio Disney", img:"https://upload.wikimedia.org/wikipedia/commons/0/0b/Radio_Disney_logo.svg", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/DISNEY_SC"},
+{nombre:"Moda", img:"https://via.placeholder.com/150?text=Moda", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/RADIO_MODA_SC"}
+];
+
+const lista = document.getElementById("lista");
+const player = document.getElementById("player");
+const actual = document.getElementById("actual");
+
+let actualUrl = "";
+let favoritos = JSON.parse(localStorage.getItem("fav")) || [];
+
+function toggleFav(nombre){
+  if(favoritos.includes(nombre)){
+    favoritos = favoritos.filter(f=>f!==nombre);
+  } else {
+    favoritos.push(nombre);
+  }
+  localStorage.setItem("fav", JSON.stringify(favoritos));
+  cargar();
+}
+
+function cargar(filtro=""){
+  lista.innerHTML="";
+
+  radios
+  .filter(r=>r.nombre.toLowerCase().includes(filtro.toLowerCase()))
+  .forEach(r=>{
+    let div=document.createElement("div");
+    div.className="card";
+
+    let esFav = favoritos.includes(r.nombre);
+
+    div.innerHTML=`
+      <div class="fav" onclick="event.stopPropagation(); toggleFav('${r.nombre}')">
+        ${esFav ? "❤️" : "🤍"}
+      </div>
+      <img src="${r.img}" onerror="this.src='https://via.placeholder.com/150'">
+      <p>${r.nombre}</p>
+    `;
+
+    div.onclick=()=>{
+      actualUrl = r.url;
+      player.src = r.url;
+      player.play();
+      actual.innerText = "🎵 " + r.nombre;
+    };
+
+    lista.appendChild(div);
+  });
+}
+
+function play(){
+  if(actualUrl) player.play();
+}
+
+function stop(){
+  player.pause();
+}
+
+document.getElementById("buscador").addEventListener("input",(e)=>{
+  cargar(e.target.value);
+});
+
+cargar();
+
+</script>
+
+</body>
+</html>
