@@ -3,22 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TENAZ FM</title>
+<title>URBAN FLOW RADIO</title>
 
 <style>
 body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(180deg,#8b0000,#1a0000);
+  background: linear-gradient(180deg,#000000,#1a1a1a);
   color: white;
 }
 
-/* HEADER */
+/* 🔥 TITULO URBANO */
 .header {
   text-align: center;
-  padding: 20px;
-  font-size: 28px;
-  font-weight: bold;
+  font-size: 38px;
+  font-weight: 900;
+  margin: 20px;
+  letter-spacing: 3px;
+  background: linear-gradient(90deg,#ff0000,#ff9900,#00ffcc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 20px rgba(255,0,0,0.6);
 }
 
 /* BUSCADOR */
@@ -31,10 +36,25 @@ body {
   border: none;
 }
 
+/* CATEGORIAS */
+.categorias {
+  display: flex;
+  overflow-x: auto;
+  gap: 10px;
+  padding: 15px;
+}
+
+.cat {
+  background: #ff9900;
+  padding: 8px 15px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
 /* GRID */
 .grid {
   display: grid;
-  grid-template-columns: repeat(4,1fr);
+  grid-template-columns: repeat(3,1fr);
   gap: 12px;
   padding: 15px;
 }
@@ -45,23 +65,13 @@ body {
   border-radius: 15px;
   padding: 10px;
   text-align: center;
-  position: relative;
   cursor: pointer;
 }
 
 .radio img {
   width: 100%;
   height: 80px;
-  object-fit: cover;
   border-radius: 10px;
-}
-
-/* FAVORITO */
-.fav {
-  position: absolute;
-  top: 5px;
-  right: 8px;
-  font-size: 18px;
 }
 
 /* PLAYER */
@@ -81,16 +91,14 @@ body {
   border-radius: 10px;
 }
 
-/* BOTON */
 .btn {
-  background: orange;
+  background: #ff9900;
   border: none;
   border-radius: 50%;
   padding: 10px;
   font-size: 18px;
 }
 
-/* VOLUMEN */
 .vol {
   width: 80px;
 }
@@ -99,9 +107,17 @@ body {
 
 <body>
 
-<div class="header">🔥 TENAZ FM</div>
+<div class="header">🔥 URBAN FLOW RADIO 🔥</div>
 
-<input class="search" id="buscador" placeholder="Buscar radio...">
+<input class="search" id="buscador" placeholder="Buscar...">
+
+<div class="categorias">
+  <div class="cat" onclick="filtrar('all')">Todo</div>
+  <div class="cat" onclick="filtrar('urban')">Urban</div>
+  <div class="cat" onclick="filtrar('baladasUSA')">Baladas USA</div>
+  <div class="cat" onclick="filtrar('baladasLATAM')">Baladas LATAM</div>
+  <div class="cat" onclick="filtrar('baladasEU')">Baladas Europa</div>
+</div>
 
 <div class="grid" id="grid"></div>
 
@@ -110,7 +126,6 @@ body {
   <div id="titulo">Nada sonando</div>
 
   <button class="btn" id="playBtn">▶</button>
-
   <input type="range" id="vol" class="vol" min="0" max="1" step="0.01" value="1">
 
   <audio id="audio"></audio>
@@ -119,19 +134,24 @@ body {
 <script>
 const radios = [
 
-/* FUNCIONAN */
-{nombre:"Dance Wave", url:"https://dancewave.online/dance.mp3"},
-{nombre:"Radio Internacional", url:"https://streams.ilovemusic.de/iloveradio1.mp3"},
+/* URBAN (los que funcionan) */
+{nombre:"Dance Wave", tipo:"urban", url:"https://dancewave.online/dance.mp3"},
+{nombre:"Radio Internacional", tipo:"urban", url:"https://streams.ilovemusic.de/iloveradio1.mp3"},
+{nombre:"Urban Radio", tipo:"urban", url:"https://stream.0nlineradio.com/urban"},
 
-/* HIP HOP 🔥 */
-{nombre:"Hot 108 Jamz", url:"https://icecast.powerhitz.com/icecast.php?i=1&file=hot108jamz"},
-{nombre:"2000 FM Hip Hop", url:"https://2000fm.stream.laut.fm/2000fm"},
-{nombre:"Urban Radio", url:"https://stream.0nlineradio.com/urban"},
-{nombre:"Streetz Radio", url:"https://stream.zeno.fm/9s7z1k5f8wzuv"}
+/* BALADAS USA */
+{nombre:"Soft Rock Radio", tipo:"baladasUSA", url:"https://stream.zeno.fm/7g1p9h8tkwzuv"},
+{nombre:"Love Songs FM", tipo:"baladasUSA", url:"https://stream.zeno.fm/9s7z1k5f8wzuv"},
+
+/* BALADAS LATAM */
+{nombre:"Baladas Románticas", tipo:"baladasLATAM", url:"https://stream.zeno.fm/f3y6q8zq5wzuv"},
+{nombre:"Amor FM Latino", tipo:"baladasLATAM", url:"https://stream.zeno.fm/8u0zv4kz2wzuv"},
+
+/* BALADAS EUROPA */
+{nombre:"Euro Love Radio", tipo:"baladasEU", url:"https://stream.zeno.fm/d3y6f9r6kwzuv"},
+{nombre:"Romantic Hits EU", tipo:"baladasEU", url:"https://stream.zeno.fm/0r0xa792kwzuv"}
 
 ];
-
-let favoritos = JSON.parse(localStorage.getItem("fav")) || [];
 
 const grid = document.getElementById("grid");
 const audio = document.getElementById("audio");
@@ -140,11 +160,11 @@ const cover = document.getElementById("cover");
 const playBtn = document.getElementById("playBtn");
 const vol = document.getElementById("vol");
 
-let current = null;
+let listaActual = radios;
 
-/* LOGO AUTOMATICO */
-function getLogo(nombre){
-  return `https://ui-avatars.com/api/?name=${encodeURIComponent(nombre)}&background=ff9800&color=fff`;
+/* LOGO */
+function logo(nombre){
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(nombre)}&background=ff9900&color=fff`;
 }
 
 /* RENDER */
@@ -152,15 +172,11 @@ function render(lista){
   grid.innerHTML = "";
 
   lista.forEach(r => {
-
-    const fav = favoritos.includes(r.nombre);
-
     const div = document.createElement("div");
-    div.className = "radio";
 
+    div.className = "radio";
     div.innerHTML = `
-      <span class="fav">${fav ? "❤️" : "🤍"}</span>
-      <img src="${getLogo(r.nombre)}">
+      <img src="${logo(r.nombre)}">
       <p>${r.nombre}</p>
     `;
 
@@ -168,32 +184,29 @@ function render(lista){
       audio.src = r.url;
       audio.play();
       titulo.textContent = r.nombre;
-      cover.src = getLogo(r.nombre);
-      current = r;
-    };
-
-    /* FAVORITO */
-    div.querySelector(".fav").onclick = (e) => {
-      e.stopPropagation();
-
-      if(fav){
-        favoritos = favoritos.filter(f => f !== r.nombre);
-      } else {
-        favoritos.push(r.nombre);
-      }
-
-      localStorage.setItem("fav", JSON.stringify(favoritos));
-      render(lista);
+      cover.src = logo(r.nombre);
     };
 
     grid.appendChild(div);
   });
 }
 
-/* PLAY REAL */
-playBtn.onclick = () => {
-  if(!audio.src) return;
+/* FILTRO */
+function filtrar(tipo){
+  if(tipo === "all") listaActual = radios;
+  else listaActual = radios.filter(r => r.tipo === tipo);
 
+  render(listaActual);
+}
+
+/* BUSCAR */
+document.getElementById("buscador").addEventListener("input", e => {
+  const t = e.target.value.toLowerCase();
+  render(listaActual.filter(r => r.nombre.toLowerCase().includes(t)));
+});
+
+/* PLAY */
+playBtn.onclick = () => {
   if(audio.paused){
     audio.play();
     playBtn.textContent = "⏸";
@@ -203,18 +216,11 @@ playBtn.onclick = () => {
   }
 };
 
-/* SINCRONIZAR BOTON */
 audio.onplay = () => playBtn.textContent = "⏸";
 audio.onpause = () => playBtn.textContent = "▶";
 
 /* VOLUMEN */
 vol.oninput = () => audio.volume = vol.value;
-
-/* BUSCAR */
-document.getElementById("buscador").addEventListener("input", e => {
-  const t = e.target.value.toLowerCase();
-  render(radios.filter(r => r.nombre.toLowerCase().includes(t)));
-});
 
 /* INIT */
 render(radios);
