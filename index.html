@@ -9,71 +9,80 @@
 body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(180deg,#b30000,#1a0000);
+  background: radial-gradient(circle at top,#ff0000,#0a0000);
   color: white;
 }
 
+/* LOGO */
 .logo {
-  display: flex;
-  justify-content: center;
+  text-align: center;
   padding: 15px;
 }
 .logo img {
-  width: 100%;
-  max-width: 420px;
-  border-radius: 15px;
-  animation: glow 2s infinite alternate;
-}
-@keyframes glow {
-  from { box-shadow: 0 0 10px red; }
-  to { box-shadow: 0 0 30px orange; }
+  width: 90%;
+  max-width: 380px;
+  border-radius: 20px;
+  box-shadow: 0 0 30px red;
 }
 
+/* BUSCADOR */
 .search {
   width: 85%;
   margin: auto;
   padding: 12px;
-  border-radius: 25px;
+  border-radius: 30px;
   border: none;
   display: block;
+  background: rgba(255,255,255,0.1);
+  color: white;
+  backdrop-filter: blur(10px);
 }
 
+/* GRID */
 .grid {
   display: grid;
   grid-template-columns: repeat(2,1fr);
-  gap: 12px;
+  gap: 15px;
   padding: 15px;
   padding-bottom: 120px;
 }
 
 .radio {
-  background: white;
-  color: black;
-  border-radius: 15px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 20px;
   padding: 10px;
   text-align: center;
   cursor: pointer;
-  position: relative;
+  backdrop-filter: blur(10px);
+  transition: 0.3s;
+}
+
+.radio:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px red;
 }
 
 .radio img {
   width: 100%;
-  height: 90px;
-  border-radius: 10px;
+  height: 100px;
+  border-radius: 15px;
 }
 
+/* FAVORITOS */
 .fav {
   position: absolute;
+  right: 10px;
   top: 5px;
-  right: 8px;
   font-size: 18px;
 }
 
+/* PLAYER */
 .player {
   position: fixed;
   bottom: 0;
   width: 100%;
-  background: #111;
+  background: rgba(0,0,0,0.9);
+  backdrop-filter: blur(10px);
   padding: 10px;
   display: flex;
   align-items: center;
@@ -81,20 +90,22 @@ body {
 }
 
 .player img {
-  width: 50px;
-  border-radius: 10px;
+  width: 55px;
+  border-radius: 12px;
 }
 
 .btn {
   background: red;
   border: none;
   border-radius: 50%;
-  padding: 10px;
+  padding: 12px;
+  font-size: 16px;
   color: white;
+  box-shadow: 0 0 10px red;
 }
 
 .vol {
-  width: 80px;
+  width: 70px;
 }
 </style>
 </head>
@@ -105,7 +116,7 @@ body {
   <img src="logo.png">
 </div>
 
-<input class="search" id="buscador" placeholder="Buscar radio...">
+<input class="search" id="buscador" placeholder="🔍 Buscar radio...">
 
 <div class="grid" id="grid"></div>
 
@@ -123,27 +134,15 @@ body {
 
 <script>
 let radios = [
-
-/* 🌍 INTERNACIONALES */
-{nombre:"Urban Radio", url:"https://stream.0nlineradio.com/urban"},
-{nombre:"Dance Wave", url:"https://dancewave.online/dance.mp3"},
-{nombre:"I Love Radio", url:"https://streams.ilovemusic.de/iloveradio1.mp3"},
-{nombre:"Romantic Hits EU", url:"https://stream.zeno.fm/0r0xa792kwzuv"},
-
-/* 🇵🇪 PERÚ (FUNCIONAN EN WEB) */
-{nombre:"Exitosa Perú", url:"https://cu.onliv3.com/live/exitosa.m3u8"},
-{nombre:"Radio Nacional Perú", url:"https://stream.radionacional.gob.pe/nacional.mp3"},
-{nombre:"La Zona Radio", url:"https://stream.zeno.fm/8t0w9nq8qg0uv"},
-{nombre:"Radio Panamericana", url:"https://stream.zeno.fm/9q8nzk6h5f8uv"},
-{nombre:"Onda Digital Perú", url:"https://stream.zeno.fm/rcxg9z8h5f8uv"},
-
-/* 🔥 URBANO */
-{nombre:"Reggaeton Hits", url:"https://stream.zeno.fm/uk3m69v8u0hvv"},
-{nombre:"Trap Latino", url:"https://stream.zeno.fm/f3h5h0m9u0hvv"}
-
+{nombre:"RPP Noticias", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/RPP_SC.mp3"},
+{nombre:"Ritmo Romántica", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/CRP_RIT_SC.mp3"},
+{nombre:"Radio Moda", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/CRP_MOD_SC.mp3"},
+{nombre:"Radiomar", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/CRP_MAR_SC.mp3"},
+{nombre:"La Karibeña", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/CRP_KAR_SC.mp3"},
+{nombre:"Oasis", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/CRP_OAS_SC.mp3"},
+{nombre:"Exitosa", url:"https://cu.onliv3.com/live/exitosa.m3u8"},
+{nombre:"Radio Nacional", url:"https://stream.radionacional.gob.pe/nacional.mp3"}
 ];
-
-let favoritos = JSON.parse(localStorage.getItem("fav")) || [];
 
 const grid = document.getElementById("grid");
 const audio = document.getElementById("audio");
@@ -156,44 +155,44 @@ audio.setAttribute("playsinline", true);
 
 let hls;
 
+/* PROXY */
+function proxy(url){
+  return "https://api.allorigins.win/raw?url=" + encodeURIComponent(url);
+}
+
 function logo(nombre){
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(nombre)}&background=ff0000&color=fff`;
 }
 
 function playRadio(url){
+  if(hls){ hls.destroy(); }
 
-  if(hls){
-    hls.destroy();
-  }
+  const finalUrl = proxy(url);
 
   if(url.includes(".m3u8")){
     if(Hls.isSupported()){
       hls = new Hls();
-      hls.loadSource(url);
+      hls.loadSource(finalUrl);
       hls.attachMedia(audio);
       hls.on(Hls.Events.MANIFEST_PARSED, () => audio.play());
     } else {
-      audio.src = url;
+      audio.src = finalUrl;
       audio.play();
     }
   } else {
-    audio.src = url;
+    audio.src = finalUrl;
     audio.play();
   }
 }
 
-function render(lista){
+function render(lista = radios){
   grid.innerHTML = "";
 
   lista.forEach(r => {
-
-    const esFav = favoritos.includes(r.nombre);
-
     const div = document.createElement("div");
     div.className = "radio";
 
     div.innerHTML = `
-      <span class="fav">${esFav ? "❤️" : "🤍"}</span>
       <img src="${logo(r.nombre)}">
       <p>${r.nombre}</p>
     `;
@@ -202,19 +201,6 @@ function render(lista){
       playRadio(r.url);
       titulo.textContent = r.nombre;
       cover.src = logo(r.nombre);
-    };
-
-    div.querySelector(".fav").onclick = (e) => {
-      e.stopPropagation();
-
-      if(esFav){
-        favoritos = favoritos.filter(f => f !== r.nombre);
-      } else {
-        favoritos.push(r.nombre);
-      }
-
-      localStorage.setItem("fav", JSON.stringify(favoritos));
-      render(radios);
     };
 
     grid.appendChild(div);
@@ -239,15 +225,7 @@ audio.onpause = () => playBtn.textContent = "▶";
 
 vol.oninput = () => audio.volume = vol.value;
 
-/* 🔥 AUTO RECONEXIÓN */
-audio.onerror = () => {
-  setTimeout(() => {
-    audio.load();
-    audio.play();
-  }, 3000);
-};
-
-render(radios);
+render();
 </script>
 
 </body>
