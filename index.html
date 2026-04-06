@@ -3,70 +3,56 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>URBAN FLOW RADIO TENAZOA</title>
+<title>URBAN FLOW RADIO</title>
 
 <style>
-:root{
-  --accent:#ff1a1a;
-}
 body{
   margin:0;
-  font-family:'Segoe UI',sans-serif;
-  background: radial-gradient(circle,#3a0000,#000);
-  color:#fff;
+  font-family:sans-serif;
+  background:#0a0000;
+  color:white;
 }
 
-/* HEADER */
-.header{padding:15px;}
-.logo{display:flex;align-items:center;gap:10px;}
-.logo img{width:45px;border-radius:10px;box-shadow:0 0 15px red;}
+.header{padding:15px}
 .search{
-  width:100%;margin-top:10px;padding:12px;border-radius:25px;
-  border:none;background:rgba(255,255,255,.1);color:white;
+  width:100%;
+  padding:12px;
+  border-radius:25px;
+  border:none;
+  background:#222;
+  color:white;
 }
 
-/* CHIPS */
-.chips{display:flex;gap:8px;margin-top:10px;overflow:auto;}
-.chip{
-  padding:8px 12px;border-radius:20px;
-  background:rgba(255,255,255,.1);cursor:pointer;
-}
-.chip.active{background:red}
-
-/* GRID */
 .grid{
   display:grid;
   grid-template-columns:repeat(2,1fr);
-  gap:12px;
-  padding:15px;
-  padding-bottom:120px;
+  gap:10px;
+  padding:10px;
+  padding-bottom:100px;
 }
 
 .card{
-  background:rgba(255,255,255,.08);
-  border-radius:18px;
+  background:#1a1a1a;
+  border-radius:15px;
   padding:10px;
   text-align:center;
-  backdrop-filter:blur(10px);
 }
 
-.card img{width:100%;height:100px;border-radius:12px;}
+.card img{
+  width:100%;
+  border-radius:10px;
+}
 
-.fav{position:absolute;right:10px;top:5px}
-
-/* PLAYER */
 .player{
   position:fixed;
   bottom:0;
   width:100%;
-  background:rgba(0,0,0,.9);
+  background:#111;
+  padding:10px;
   display:flex;
   align-items:center;
-  padding:10px;
   gap:10px;
 }
-
-.cover img{width:50px;border-radius:10px;}
 
 .btn{
   background:red;
@@ -75,51 +61,20 @@ body{
   width:40px;height:40px;
   color:white;
 }
-
-.bars{display:flex;gap:2px;height:12px;}
-.bar{
-  width:3px;background:red;
-  animation:beat .8s infinite;
-}
-@keyframes beat{
-  0%,100%{height:4px}
-  50%{height:12px}
-}
-.hidden{display:none}
 </style>
 </head>
 
 <body>
 
 <div class="header">
-  <div class="logo">
-    <img src="logo.png">
-    <h3>URBAN FLOW RADIO</h3>
-  </div>
-
   <input id="search" class="search" placeholder="Buscar radio...">
-
-  <div class="chips">
-    <div class="chip active" data="all">Todas</div>
-    <div class="chip" data="peru">Perú</div>
-    <div class="chip" data="online">Online</div>
-  </div>
 </div>
 
 <div class="grid" id="grid"></div>
 
 <div class="player">
-  <div class="cover">
-    <img id="cover" src="https://via.placeholder.com/50">
-  </div>
-
-  <div>
-    <div id="title">Nada sonando</div>
-    <div class="bars hidden" id="bars">
-      <div class="bar"></div><div class="bar"></div><div class="bar"></div>
-    </div>
-  </div>
-
+  <img id="cover" src="https://via.placeholder.com/50">
+  <div id="title">Nada sonando</div>
   <button id="playBtn" class="btn">▶</button>
   <audio id="audio"></audio>
 </div>
@@ -139,7 +94,7 @@ const radios = [
 {nombre:"Exitosa", tipo:"peru", url:"https://cu.onliv3.com/live/exitosa.m3u8"},
 {nombre:"Radio Nacional", tipo:"peru", url:"https://stream.radionacional.gob.pe/nacional.mp3"},
 
-/* 🌍 ONLINE (TUS RADIOS) */
+/* 🌍 TUS RADIOS */
 {nombre:"Urban Radio", tipo:"online", url:"https://stream.0nlineradio.com/urban"},
 {nombre:"Dance Wave", tipo:"online", url:"https://dancewave.online/dance.mp3"},
 {nombre:"Radio Internacional", tipo:"online", url:"https://streams.ilovemusic.de/iloveradio1.mp3"},
@@ -151,13 +106,19 @@ const grid = document.getElementById("grid");
 const audio = document.getElementById("audio");
 const title = document.getElementById("title");
 const cover = document.getElementById("cover");
-const bars = document.getElementById("bars");
 const playBtn = document.getElementById("playBtn");
+
+audio.muted = false;
+audio.volume = 1;
 
 let hls;
 
-function proxy(u){
-  return "https://api.allorigins.win/raw?url=" + encodeURIComponent(u);
+/* 🔥 PROXY INTELIGENTE */
+function getUrl(url){
+  if(url.includes("streamtheworld")){
+    return "https://corsproxy.io/?"+encodeURIComponent(url);
+  }
+  return url;
 }
 
 function logo(n){
@@ -165,30 +126,34 @@ function logo(n){
 }
 
 function playRadio(r){
-  if(hls){hls.destroy();}
 
-  const url = proxy(r.url);
+  if(hls){ hls.destroy(); }
+
+  const finalUrl = getUrl(r.url);
 
   if(r.url.includes(".m3u8")){
     if(Hls.isSupported()){
-      hls=new Hls();
-      hls.loadSource(url);
+      hls = new Hls();
+      hls.loadSource(finalUrl);
       hls.attachMedia(audio);
-      hls.on(Hls.Events.MANIFEST_PARSED,()=>audio.play());
-    }else{
-      audio.src=url;audio.play();
+      hls.on(Hls.Events.MANIFEST_PARSED, ()=> audio.play());
+    } else {
+      audio.src = finalUrl;
+      audio.play();
     }
-  }else{
-    audio.src=url;audio.play();
+  } else {
+    audio.src = finalUrl;
+    audio.play();
   }
 
-  title.textContent=r.nombre;
-  cover.src=logo(r.nombre);
+  title.textContent = r.nombre;
+  cover.src = logo(r.nombre);
 }
 
-function render(lista){
+/* RENDER */
+function render(list){
   grid.innerHTML="";
-  lista.forEach(r=>{
+  list.forEach(r=>{
     const d=document.createElement("div");
     d.className="card";
     d.innerHTML=`
@@ -202,37 +167,21 @@ function render(lista){
 
 render(radios);
 
-/* BUSCADOR */
+/* BUSCAR */
 search.oninput=e=>{
   const t=e.target.value.toLowerCase();
   render(radios.filter(r=>r.nombre.toLowerCase().includes(t)));
 };
 
-/* FILTROS */
-document.querySelectorAll(".chip").forEach(c=>{
-  c.onclick=()=>{
-    document.querySelectorAll(".chip").forEach(x=>x.classList.remove("active"));
-    c.classList.add("active");
-
-    if(c.dataset==="all") render(radios);
-    else render(radios.filter(r=>r.tipo===c.dataset));
-  };
-});
-
-/* PLAYER */
+/* PLAY */
 playBtn.onclick=()=>{
   if(audio.paused){audio.play();}else{audio.pause();}
 };
 
-audio.onplay=()=>{
-  playBtn.textContent="⏸";
-  bars.classList.remove("hidden");
-};
-
-audio.onpause=()=>{
-  playBtn.textContent="▶";
-  bars.classList.add("hidden");
-};
+/* FIX ANDROID */
+document.body.addEventListener("click", () => {
+  audio.play().catch(()=>{});
+});
 </script>
 
 </body>
