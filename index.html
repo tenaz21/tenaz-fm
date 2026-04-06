@@ -3,7 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Urban Flow Radio PRO</title>
+<title>Urban Flow Radio</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#020617">
 
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
@@ -105,7 +109,7 @@ body{
 <body>
 
 <div class="header">
-  <img src="logo.png" onerror="this.src='https://via.placeholder.com/90'">
+  <img src="https://via.placeholder.com/90">
   <h2>Urban Flow Radio</h2>
 </div>
 
@@ -125,20 +129,14 @@ body{
 
 <script>
 
-/* 🔥 TU PROXY */
-const PROXY = "https://radio-proxy-33qg.onrender.com/radio?url=";
-
-/* 🎧 RADIOS (FUNCIONANDO) */
+/* 🎧 RADIOS ESTABLES */
 const radios = [
-{nombre:"RPP Noticias", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/RPP_SC.mp3"},
 {nombre:"Exitosa", url:"https://cu.onliv3.com/live/exitosa.m3u8"},
 {nombre:"Radio Nacional", url:"https://stream.radionacional.gob.pe/nacional.mp3"},
-{nombre:"La Karibeña", url:"https://stream.zeno.fm/karibena"},
-
 {nombre:"Urban Radio", url:"https://stream.0nlineradio.com/urban"},
 {nombre:"Dance Wave", url:"https://dancewave.online/dance.mp3"},
 {nombre:"Radio Internacional", url:"https://streams.ilovemusic.de/iloveradio1.mp3"},
-{nombre:"Romantic Hits EU", url:"https://stream.zeno.fm/0r0xa792kwzuv"}
+{nombre:"Romantic Hits", url:"https://stream.zeno.fm/0r0xa792kwzuv"}
 ];
 
 let favoritos = JSON.parse(localStorage.getItem("fav")) || [];
@@ -157,27 +155,25 @@ function logo(n){
   return "https://ui-avatars.com/api/?name="+encodeURIComponent(n)+"&background=0ea5e9&color=fff";
 }
 
-/* PLAY PRO */
+/* PLAY */
 function playRadio(r){
-
-  const url = PROXY + encodeURIComponent(r.url);
 
   if(hls){
     hls.destroy();
   }
 
-  if(url.includes(".m3u8")){
+  if(r.url.includes(".m3u8")){
     if(Hls.isSupported()){
       hls = new Hls();
-      hls.loadSource(url);
+      hls.loadSource(r.url);
       hls.attachMedia(audio);
       hls.on(Hls.Events.MANIFEST_PARSED, ()=> audio.play());
     } else {
-      audio.src = url;
+      audio.src = r.url;
       audio.play();
     }
   } else {
-    audio.src = url;
+    audio.src = r.url;
     audio.play();
   }
 
