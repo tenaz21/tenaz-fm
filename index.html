@@ -3,102 +3,134 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>URBAN FLOW RADIO</title>
+<title>Urban Flow Radio</title>
 
 <style>
 body{
   margin:0;
-  font-family:sans-serif;
-  background:#0a0000;
+  font-family:'Segoe UI',sans-serif;
+  background:linear-gradient(180deg,#020617,#0f172a);
   color:white;
 }
 
-.header{padding:15px}
+/* LOGO */
+.logo{
+  text-align:center;
+  padding:20px;
+}
+.logo img{
+  width:120px;
+  border-radius:20px;
+  box-shadow:0 0 20px #00f0ff;
+}
+
+/* BUSCADOR */
 .search{
-  width:100%;
+  width:90%;
+  margin:auto;
+  display:block;
   padding:12px;
   border-radius:25px;
   border:none;
-  background:#222;
+  background:#1e293b;
   color:white;
+  margin-bottom:10px;
 }
 
+/* GRID */
 .grid{
   display:grid;
   grid-template-columns:repeat(2,1fr);
-  gap:10px;
-  padding:10px;
-  padding-bottom:100px;
+  gap:12px;
+  padding:15px;
+  padding-bottom:120px;
 }
 
 .card{
-  background:#1a1a1a;
+  background:#1e293b;
   border-radius:15px;
   padding:10px;
   text-align:center;
+  transition:0.3s;
 }
-
+.card:hover{
+  transform:scale(1.05);
+  box-shadow:0 0 15px #00f0ff;
+}
 .card img{
   width:100%;
   border-radius:10px;
 }
 
+/* PLAYER */
 .player{
   position:fixed;
   bottom:0;
   width:100%;
-  background:#111;
+  background:#020617;
   padding:10px;
   display:flex;
   align-items:center;
   gap:10px;
 }
 
+.cover{
+  width:50px;
+  border-radius:10px;
+}
+
 .btn{
-  background:red;
+  background:#00f0ff;
   border:none;
   border-radius:50%;
-  width:40px;height:40px;
-  color:white;
+  width:40px;
+  height:40px;
+  color:black;
+  font-size:16px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="header">
-  <input id="search" class="search" placeholder="Buscar radio...">
+<div class="logo">
+  <img src="logo.png" onerror="this.src='https://via.placeholder.com/120'">
+  <h2>Urban Flow Radio</h2>
 </div>
+
+<input id="search" class="search" placeholder="🔍 Buscar radio...">
 
 <div class="grid" id="grid"></div>
 
 <div class="player">
-  <img id="cover" src="https://via.placeholder.com/50">
+  <img id="cover" class="cover" src="https://via.placeholder.com/50">
   <div id="title">Nada sonando</div>
   <button id="playBtn" class="btn">▶</button>
   <audio id="audio"></audio>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-
 <script>
+/* 🔥 TU SERVIDOR PRO */
+const PROXY = "https://radio-proxy-33qg.onrender.com/radio?url=";
+
+/* 🎧 RADIOS */
 const radios = [
 
 /* 🇵🇪 PERÚ */
-{nombre:"RPP Noticias", tipo:"peru", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/RPP_SC.mp3"},
-{nombre:"Ritmo Romántica", tipo:"peru", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/CRP_RIT_SC.mp3"},
-{nombre:"Radio Moda", tipo:"peru", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/CRP_MOD_SC.mp3"},
-{nombre:"Radiomar", tipo:"peru", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/CRP_MAR_SC.mp3"},
-{nombre:"La Karibeña", tipo:"peru", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/CRP_KAR_SC.mp3"},
-{nombre:"Oasis", tipo:"peru", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/CRP_OAS_SC.mp3"},
-{nombre:"Exitosa", tipo:"peru", url:"https://cu.onliv3.com/live/exitosa.m3u8"},
-{nombre:"Radio Nacional", tipo:"peru", url:"https://stream.radionacional.gob.pe/nacional.mp3"},
+{nombre:"RPP Noticias", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/RPP_SC.mp3"},
+{nombre:"Ritmo Romántica", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/CRP_RIT_SC.mp3"},
+{nombre:"Radio Moda", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/CRP_MOD_SC.mp3"},
+{nombre:"Radiomar", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/CRP_MAR_SC.mp3"},
+{nombre:"La Karibeña", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/CRP_KAR_SC.mp3"},
+{nombre:"Oasis", url:"https://playerservices.streamtheworld.com/api/livestream-redirect/CRP_OAS_SC.mp3"},
+{nombre:"Exitosa", url:"https://cu.onliv3.com/live/exitosa.m3u8"},
+{nombre:"Radio Nacional", url:"https://stream.radionacional.gob.pe/nacional.mp3"},
 
-/* 🌍 TUS RADIOS */
-{nombre:"Urban Radio", tipo:"online", url:"https://stream.0nlineradio.com/urban"},
-{nombre:"Dance Wave", tipo:"online", url:"https://dancewave.online/dance.mp3"},
-{nombre:"Radio Internacional", tipo:"online", url:"https://streams.ilovemusic.de/iloveradio1.mp3"},
-{nombre:"Romantic Hits EU", tipo:"online", url:"https://stream.zeno.fm/0r0xa792kwzuv"}
+/* 🌍 ONLINE */
+{nombre:"Urban Radio", url:"https://stream.0nlineradio.com/urban"},
+{nombre:"Dance Wave", url:"https://dancewave.online/dance.mp3"},
+{nombre:"Radio Internacional", url:"https://streams.ilovemusic.de/iloveradio1.mp3"},
+{nombre:"Romantic Hits EU", url:"https://stream.zeno.fm/0r0xa792kwzuv"}
 
 ];
 
@@ -108,43 +140,17 @@ const title = document.getElementById("title");
 const cover = document.getElementById("cover");
 const playBtn = document.getElementById("playBtn");
 
-audio.muted = false;
-audio.volume = 1;
-
-let hls;
-
-/* 🔥 PROXY INTELIGENTE */
-function getUrl(url){
-  if(url.includes("streamtheworld")){
-    return "https://corsproxy.io/?"+encodeURIComponent(url);
-  }
-  return url;
-}
-
+/* LOGO GENERADOR */
 function logo(n){
-  return "https://ui-avatars.com/api/?name="+encodeURIComponent(n)+"&background=ff0000&color=fff";
+  return "https://ui-avatars.com/api/?name="+encodeURIComponent(n)+"&background=0ea5e9&color=fff";
 }
 
+/* PLAY */
 function playRadio(r){
+  const url = PROXY + encodeURIComponent(r.url);
 
-  if(hls){ hls.destroy(); }
-
-  const finalUrl = getUrl(r.url);
-
-  if(r.url.includes(".m3u8")){
-    if(Hls.isSupported()){
-      hls = new Hls();
-      hls.loadSource(finalUrl);
-      hls.attachMedia(audio);
-      hls.on(Hls.Events.MANIFEST_PARSED, ()=> audio.play());
-    } else {
-      audio.src = finalUrl;
-      audio.play();
-    }
-  } else {
-    audio.src = finalUrl;
-    audio.play();
-  }
+  audio.src = url;
+  audio.play();
 
   title.textContent = r.nombre;
   cover.src = logo(r.nombre);
@@ -165,23 +171,25 @@ function render(list){
   });
 }
 
+/* INIT */
 render(radios);
 
-/* BUSCAR */
+/* BUSCADOR */
 search.oninput=e=>{
   const t=e.target.value.toLowerCase();
   render(radios.filter(r=>r.nombre.toLowerCase().includes(t)));
 };
 
-/* PLAY */
+/* PLAY / PAUSE */
 playBtn.onclick=()=>{
-  if(audio.paused){audio.play();}else{audio.pause();}
+  if(audio.paused){
+    audio.play();
+    playBtn.textContent="⏸";
+  } else {
+    audio.pause();
+    playBtn.textContent="▶";
+  }
 };
-
-/* FIX ANDROID */
-document.body.addEventListener("click", () => {
-  audio.play().catch(()=>{});
-});
 </script>
 
 </body>
